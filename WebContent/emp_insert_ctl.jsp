@@ -15,9 +15,7 @@
     int age = 0;
     String first = "";
     String last = "";
-    String passwd = "";
-     
-     
+    String passwd = "";     
      
     id = Integer.parseInt(request.getParameter("id"));
     passwd = request.getParameter("passwd");
@@ -25,17 +23,16 @@
     first = request.getParameter("first");
     last = request.getParameter("last");
      
-     
-    Connection conn = DBUtil.getConnection();
-     
     //입력건수
     int rt;
+    
+    //DB 연결
+    Connection conn = DBUtil.getConnection();
      
     //PreparedStatement 선언
     PreparedStatement pstmt = null;
 try {           
-          
-         
+       
         StringBuffer sb= new StringBuffer("");
         sb.append(" insert into emp (                  \n");      
         sb.append("      id                         ,\n");       
@@ -67,8 +64,7 @@ try {
             </script>
             <%
         }
-         
-         
+        
         //커밋
         //conn.commit();
          
@@ -80,6 +76,7 @@ try {
      
 } finally {
     //관련자원 닫기
-    DBUtil.closeConnection(conn, pstmt);
+    //DB 연결
+    DBUtil.closeConnection(conn, pstmt);     
 }
 %>

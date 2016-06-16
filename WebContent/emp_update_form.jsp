@@ -1,23 +1,31 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-<%@ page import="com.rp.DBUtil" %>
 <%
 request.setCharacterEncoding("utf-8");
 String id = request.getParameter("id");
+
+//DB 연결
+//STEP 2: Register JDBC driver
+Class.forName("com.mysql.jdbc.Driver");
+//DB연결 - 직접연결
+Connection conn = null;
+
+//STEP 3: Open a connection
+System.out.println("Connecting to database...");
+conn = DriverManager.getConnection("jdbc:mysql://172.16.168.2:3306/wsjeongdb","wsjeong","rplinux");
+
 //Query작성
 StringBuffer sb= new StringBuffer("");
 sb.append(" SELECT                          \n");      
 sb.append("      id                         ,\n");       
-sb.append("      passwd                         ,\n");       
+sb.append("      passwd                     ,\n");       
 sb.append("      first                      ,\n");       
 sb.append("      last                       ,\n");       
 sb.append("      age                        \n");       
 sb.append(" FROM emp                        \n"); 
 sb.append(" where      id = ?                  \n");
  
-//DB 연결
-Connection conn = DBUtil.getConnection();
 //Resultset 선언
 ResultSet rs = null;
 //PreparedStatement 선언
@@ -48,8 +56,8 @@ try {
       <td><input name="id" value="<%=rs.getString("id")%>"></td>
   </tr>
   <tr>
-      <td>ID</td>
-      <td><input name="id" value="<%=rs.getString("passwd")%>"></td>
+      <td>Password</td>
+      <td><input name="passwd" value="<%=rs.getString("passwd")%>"></td>
   </tr>
   <tr>
       <td>First Name</td>
@@ -81,7 +89,8 @@ try {
      
 } finally {
     //관련자원 닫기
-    DBUtil.closeConnection(conn, pstmt);
+        if (pstmt != null) { try { pstmt.close(); } catch  (SQLException e) { e.printStackTrace();}}
+        if (conn != null) { try { conn.close(); } catch  (SQLException e) { e.printStackTrace();}}
      
 }
 %>

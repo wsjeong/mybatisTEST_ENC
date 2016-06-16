@@ -24,6 +24,9 @@ public class DBUtil {
     public static void closeConnection(Connection conn){
         if (conn != null) { try { conn.close(); } catch  (SQLException e) { e.printStackTrace();}}
     }
+    public static void closeConnection(PreparedStatement pstmt){
+        if (pstmt != null) { try { pstmt.close(); } catch  (SQLException e) { e.printStackTrace();}}
+    }
     public static void closeConnection(Connection conn, PreparedStatement pstmt){
         if (pstmt != null) { try { pstmt.close(); } catch  (SQLException e) { e.printStackTrace();}}
         if (conn != null) { try { conn.close(); } catch  (SQLException e) { e.printStackTrace();}}

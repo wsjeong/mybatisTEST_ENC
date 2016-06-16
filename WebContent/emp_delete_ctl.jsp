@@ -1,25 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="com.rp.DBUtil" %>
 <%
     //Post로 넘어온 Parameter에 대한 인코딩
     request.setCharacterEncoding("utf-8");
     System.out.println("seq:" + request.getParameter("seq"));
-     
-     
+          
     int seq = 0;
-     
-     
+          
     seq = Integer.parseInt(request.getParameter("seq"));
      
-    //STEP 2: Register JDBC driver
-    Class.forName("com.mysql.jdbc.Driver");
-     
-    //DB연결 - 직접연결
-    Connection conn = null;
-    //STEP 3: Open a connection
-    System.out.println("Connecting to database...");
-    conn = DriverManager.getConnection("jdbc:mysql://172.16.168.2:3306/wsjeongdb","wsjeong","rplinux");
+    //DB 연결
+    Connection conn = DBUtil.getConnection();
      
     //입력건수
     int rt;
@@ -27,19 +20,18 @@
     //PreparedStatement 선언
     PreparedStatement pstmt = null;
 try {           
-          
-         
+               
         StringBuffer sb= new StringBuffer("");
         sb.append(" delete from emp                  \n");      
-        sb.append(" where seq = ?                               \n"); 
+        sb.append(" where seq = ?                    \n"); 
          
-        System.out.println(sb.toString());
-         
-        //파라미터 바인딩
+       //파라미터 바인딩
         pstmt = conn.prepareStatement(sb.toString());
         pstmt.setInt( 1, seq);
-         
-         
+        
+        System.out.println(sb.toString());
+        System.out.println("Delete ID =" + seq);
+        
         //쿼리실행
         rt = pstmt.executeUpdate();
         if (rt > 0 ){
@@ -63,8 +55,7 @@ try {
      
 } finally {
     //관련자원 닫기
-    if (pstmt != null) { try { pstmt.close(); } catch  (SQLException e) { e.printStackTrace();}}
-    if (conn != null) { try { conn.close(); } catch  (SQLException e) { e.printStackTrace();}}
+    DBUtil.closeConnection(conn, pstmt);     
      
 }
 %>
