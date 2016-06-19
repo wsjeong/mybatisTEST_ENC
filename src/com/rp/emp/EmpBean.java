@@ -158,8 +158,6 @@ public class EmpBean {
         String first = request.getParameter("first");
         String last = request.getParameter("last");
         
-        int rt;
-        
         //DB 연결
         Connection conn = DBUtil.getConnection();
          
@@ -188,7 +186,7 @@ public class EmpBean {
             pstmt.setInt( 5, age);
             
             //쿼리실행
-            rt = pstmt.executeUpdate();
+            pstmt.executeUpdate();
             
             //if (rt > 0 ){
             	
@@ -230,8 +228,6 @@ public EmpDto EmpUpdate(HttpServletRequest request) throws SQLException, IOExcep
     String last = request.getParameter("last");
     int age = Integer.parseInt(request.getParameter("age"));
    
-    //입력건수
-    int rt;
     
     //DB 연결
     Connection conn = DBUtil.getConnection();
@@ -265,7 +261,7 @@ try {
          
          
         //쿼리실행
-        rt = pstmt.executeUpdate();
+       pstmt.executeUpdate();
         
          
 } catch (Exception e) {
@@ -291,9 +287,6 @@ public EmpDto EmpDelete(HttpServletRequest request) throws SQLException, IOExcep
     //DB 연결
     Connection conn = DBUtil.getConnection();
      
-    //입력건수
-    int rt;
-     
     //PreparedStatement 선언
     PreparedStatement pstmt = null;
 try {           
@@ -310,7 +303,7 @@ try {
         System.out.println("Delete ID =" + seq);
         
         //쿼리실행
-        rt = pstmt.executeUpdate();
+       pstmt.executeUpdate();
         
          
 } catch (Exception e) {
