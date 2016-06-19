@@ -59,7 +59,7 @@ al = bean.selectDetail(request);
   <tr>
       <td colspan=2>
         <input type="button" value="수정" onClick="javascript:modify('<%=al.getId()%>');">
-        <input type="button" value="삭제" onClick="javascript:delData('<%=al.getId()%>');">
+        <input type="button" value="삭제" onClick="javascript:delData('<%=al.getSeq()%>');">
       </td>
        
   </tr>

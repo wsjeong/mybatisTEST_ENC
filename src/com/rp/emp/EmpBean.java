@@ -149,4 +149,185 @@ public class EmpBean {
         return dto;
     }
     
+    public EmpDto EmpInsert(HttpServletRequest request) throws SQLException, IOException, PropertyVetoException {
+        EmpDto dto = new EmpDto();
+         
+        int id = Integer.parseInt(request.getParameter("id"));
+        String passwd = request.getParameter("passwd");
+        int age = Integer.parseInt(request.getParameter("age"));
+        String first = request.getParameter("first");
+        String last = request.getParameter("last");
+        
+        int rt;
+        
+        //DB 연결
+        Connection conn = DBUtil.getConnection();
+         
+        //PreparedStatement 선언
+        PreparedStatement pstmt = null;
+    try {           
+           
+            StringBuffer sb= new StringBuffer("");
+            sb.append(" insert into emp (                  \n");      
+            sb.append("      id                         ,\n");       
+            sb.append("      passwd                         ,\n");       
+            sb.append("      first                      ,\n");       
+            sb.append("      last                       ,\n");       
+            sb.append("      age                        \n");       
+            sb.append(" )                               \n"); 
+            sb.append(" values (?,?,?,?,?)                   \n");
+            //sb.append(" values (" + id + ",'" + first + "','" + last + "'," + age +") \n");
+            System.out.println(sb.toString());
+             
+            //파라미터 바인딩
+            pstmt = conn.prepareStatement(sb.toString());
+            pstmt.setInt( 1, id);
+            pstmt.setString( 2, passwd);
+            pstmt.setString( 3, first);
+            pstmt.setString( 4, last);
+            pstmt.setInt( 5, age);
+            
+            //쿼리실행
+            rt = pstmt.executeUpdate();
+            
+            //if (rt > 0 ){
+            	
+           // }
+            
+            //커밋
+            //conn.commit();
+             
+    } catch (Exception e) {
+        //에러인 경우 Rollback
+        //conn.rollback();
+        System.out.println("error : " + e);
+        e.printStackTrace(System.out);
+         
+    } finally {
+        //관련자원 닫기
+        //DB 연결
+        DBUtil.closeConnection(conn, pstmt);     
+    }
+    return dto;
+  }
+
+public EmpDto EmpUpdate(HttpServletRequest request) throws SQLException, IOException, PropertyVetoException {
+    EmpDto dto = new EmpDto();
+     
+  //System.out.println("seq:" + request.getParameter("seq"));
+    System.out.println("id:" + request.getParameter("id"));
+    System.out.println("password:" + request.getParameter("passwd"));
+    System.out.println("first name:" + request.getParameter("first"));
+    System.out.println("last name:" + request.getParameter("last"));
+    System.out.println("age:" + request.getParameter("age"));
+     
+    //int seq = 0;
+     
+    //seq = Integer.parseInt(request.getParameter("seq"));
+    int id = Integer.parseInt(request.getParameter("id"));
+    String passwd = request.getParameter("passwd");
+    String first = request.getParameter("first");
+    String last = request.getParameter("last");
+    int age = Integer.parseInt(request.getParameter("age"));
+   
+    //입력건수
+    int rt;
+    
+    //DB 연결
+    Connection conn = DBUtil.getConnection();
+     
+    //PreparedStatement 선언
+    PreparedStatement pstmt = null;
+    
+try {           
+         
+        StringBuffer sb= new StringBuffer("");
+        sb.append(" update emp                  \n");      
+        sb.append("      set                          \n");       
+        sb.append("      first = ?,                     \n");       
+        sb.append("      last  = ?,                     \n");       
+        sb.append("      age  = ?                       \n");       
+        sb.append(" where id = ?                       \n"); 
+               
+        System.out.println(sb.toString());
+        System.out.println("id =" + id);
+        System.out.println("passwd =" + passwd);
+        System.out.println("first =" + first);
+        System.out.println("last =" + last);
+        System.out.println("age =" + age);
+      
+        //파라미터 바인딩
+        pstmt = conn.prepareStatement(sb.toString());
+        pstmt.setString( 1, first);
+        pstmt.setString( 2, last);
+        pstmt.setInt( 3, age);
+        pstmt.setInt( 4, id);
+         
+         
+        //쿼리실행
+        rt = pstmt.executeUpdate();
+        
+         
+} catch (Exception e) {
+    //에러인 경우 Rollback
+    //conn.rollback();
+    System.out.println("error : " + e);
+    e.printStackTrace(System.out);
+     
+} finally {
+    //관련자원 닫기
+    //DB 연결
+    DBUtil.closeConnection(conn, pstmt);     
 }
+return dto;
+}
+public EmpDto EmpDelete(HttpServletRequest request) throws SQLException, IOException, PropertyVetoException {
+    EmpDto dto = new EmpDto();
+     
+    System.out.println("seq:" + request.getParameter("seq"));
+          
+    int seq = Integer.parseInt(request.getParameter("seq"));
+     
+    //DB 연결
+    Connection conn = DBUtil.getConnection();
+     
+    //입력건수
+    int rt;
+     
+    //PreparedStatement 선언
+    PreparedStatement pstmt = null;
+try {           
+               
+        StringBuffer sb= new StringBuffer("");
+        sb.append(" delete from emp                  \n");      
+        sb.append(" where seq = ?                    \n"); 
+         
+       //파라미터 바인딩
+        pstmt = conn.prepareStatement(sb.toString());
+        pstmt.setInt( 1, seq);
+        
+        System.out.println(sb.toString());
+        System.out.println("Delete ID =" + seq);
+        
+        //쿼리실행
+        rt = pstmt.executeUpdate();
+        
+         
+} catch (Exception e) {
+    //에러인 경우 Rollback
+    //conn.rollback();
+    System.out.println("error : " + e);
+    e.printStackTrace(System.out);
+     
+} finally {
+    //관련자원 닫기
+    //DB 연결
+    DBUtil.closeConnection(conn, pstmt);     
+}
+return dto;
+}
+}  
+    
+    
+    
+    
