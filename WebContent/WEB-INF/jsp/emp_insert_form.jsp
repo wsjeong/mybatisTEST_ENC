@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
+<jsp:include page="${contextPath}/inc/header.jsp"></jsp:include>
+
+<jsp:include page="${contextPath}/inc/top.jsp"></jsp:include>    
+    
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -7,8 +12,13 @@
 <title>Insert title here</title>
 </head>
 <body>
-<form name="new_form" method="post" action="emp_insert_ctl.jsp">
-<table border="1" cellspacing="0" width="500">
+<div class="container-fluid">
+      <div class="row">
+        <jsp:include page="${contextPath}/inc/left.jsp"></jsp:include>
+        
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+<form name="new_form" method="post" action="emp.do">
+<table class="table table-striped">
   <tr>
     <th width="10%">구분</th><th width="25%">입력값</th>
   </tr>
@@ -21,11 +31,11 @@
       <td><input name="passwd"></td>
   </tr>
   <tr>
-      <td>이름</td>
+      <td>성</td>
       <td><input name="first"></td>
   </tr>
   <tr>
-      <td>성</td>
+      <td>이름</td>
       <td><input name="last"></td>
   </tr>
   <tr>
@@ -33,10 +43,18 @@
       <td><input name="age"></td>
   </tr>
   <tr>
-      <td colspan=2><input type="submit"></td>
-       
+      <td colspan=2>
+      <input type="submit" value="입력">
+      <input type="hidden" name="OperationType" value="EmpInsert">
+      </td>                   
   </tr>
+
 </table>
 </form>
+        </div>
+</div>
+</div>
 </body>
 </html>
+
+<jsp:include page="${contextPath}/inc/footer.jsp"></jsp:include>

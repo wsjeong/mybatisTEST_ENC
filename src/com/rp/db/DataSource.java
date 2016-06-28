@@ -12,7 +12,8 @@ public class DataSource {
         ds.setDriverClassName("com.mysql.jdbc.Driver");
         ds.setUsername("wsjeong");
         ds.setPassword("rplinux");
-        ds.setUrl("jdbc:mysql://172.16.168.2:3306/wsjeongdb");
+        //ds.setUrl("jdbc:mysql://172.16.168.2:3306/wsjeongdb");
+        ds.setUrl("jdbc:mysql://192.168.57.102:3306/wsjeongdb");
         
      // the settings below are optional -- dbcp can work with defaults
         ds.setMinIdle(5);

@@ -6,6 +6,7 @@ public class EmpDto {
     String first;
     String last;
     int age;
+    
     public int getSeq() {
         return seq;
     }
