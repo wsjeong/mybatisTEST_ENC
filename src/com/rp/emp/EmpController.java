@@ -1,5 +1,7 @@
 package com.rp.emp;
 import java.io.IOException;
+
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -38,11 +40,14 @@ public class EmpController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // TODO Auto-generated method stub
          
-        response.setContentType("text/html"); 
+		 response.setCharacterEncoding("UTF-8");
+		 response.setContentType("text/html; charset=UTF-8");
+		 PrintWriter out = response.getWriter();
+		 
         //response.getWriter().append("Served at: ").append(request.getContextPath());
         HttpSession session = request.getSession();
         
-        System.out.println("=========================================");
+        logger.info("controller ############################################"); 
       //Operation Type
         String OperationType = request.getParameter("OperationType");
         
@@ -59,74 +64,96 @@ public class EmpController extends HttpServlet {
         int rt =0;
         
         if (OperationType == null) {
+        	
+            logger.info("OperationType = " + OperationType);
+        	
         	  EmpSvc svc = new EmpSvc();
             request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
             RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
-
-           logger.info("OperationType = " + OperationType);
-
-        	rd.forward(request, response);
-      	
+            
+            rd.forward(request, response);
+            
         } else if (OperationType.equals("SearchList")) {
+        	 logger.info("OperationType = " + OperationType);
+        	 
         	  EmpSvc svc = new EmpSvc();
             request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
             RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
              
             rd.forward(request, response);
+            
         } else if (OperationType.equals("empDetail")) {
-      	   EmpSvc svc = new EmpSvc();
-          
-      	   EmpDto al = null;
-      	   al = svc.selectDetail(request);
-
-          RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_detail.jsp");
+        	  logger.info("OperationType = " + OperationType);
+        	
+        	  EmpSvc svc = new EmpSvc();
+            request.setAttribute("detail",(EmpDto)svc.selectDetail(request));    	   
+            RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_detail.jsp");
            
-          rd.forward(request, response);
+            rd.forward(request, response);
+            
          } else if (OperationType.equals("EmpInsert_form")) {
-             
+        	 logger.info("OperationType = " + OperationType);
+        	 
            RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_insert_form.jsp");
            rd.forward(request, response);
         
         } else if (OperationType.equals("EmpInsert")) {
-        	        	 
+       	 logger.info("OperationType = " + OperationType);
+       	 
         	 EmpSvc svc = new EmpSvc();
         	 rt = svc.addEmp(request);
         	 
-             System.out.println("rt =" + rt);
-        	 
         	 if ( rt > 0){
-        		 request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
-        		 RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
-        		 
+        		// request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
+        		// RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
         		 response.sendRedirect("emplist.do");
-        	 } 	 
+        	 } 	else {       		 
+        		// PrintWriter out = response.getWriter();
+        		 
+        		 out.println("<script language='javascript'>");
+        		 out.println("alert('정상적으로 처리 되지 않았습니다.');");
+        		 //out.println("document.location.href='emplist.do'");
+        		 out.println("history.back();");
+        		 out.println("</script>");
+        	 }
          } else if (OperationType.equals("EmpUpdate_form")) {
+        	 logger.info("OperationType = " + OperationType);
+        	 
       	     EmpSvc svc = new EmpSvc();
-        	 EmpDto al = null;
-          	 al = svc.selectDetail(request);
-      	     
-           RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_update_form.jsp");
-           rd.forward(request, response);
+        	 request.setAttribute("detail",(EmpDto)svc.selectDetail(request)); 
+      	     RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_update_form.jsp");
+            
+      	     rd.forward(request, response);
            //response.sendRedirect("emp.do");
         } else if (OperationType.equals("EmpUpdate")) {
-            //EmpDto al = null;
+        	logger.info("OperationType = " + OperationType);
+        	
             EmpSvc svc = new EmpSvc();
-           // EmpDto dto = null;
             rt = svc.EmpUpdate(request);
      	     
           	 if ( rt > 0){
-        		 request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
+        		// request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
         		 RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
         		 
         		 response.sendRedirect("emplist.do");
+          	 } 	else {       		 
+        		 //PrintWriter out = response.getWriter();
+        		 
+        		 out.println("<script language='javascript'>");
+        		 out.println("alert('정상적으로 처리 되지 않았습니다.');");
+        		 //out.println("document.location.href='emplist.do'");
+        		 out.println("history.back();");
+        		 out.println("</script>");
         	 } 	
-        } else if (OperationType.equals("EmpDelete")) {        
+        } else if (OperationType.equals("EmpDelete")) {    
+        	 logger.info("OperationType = " + OperationType);
+        	
             EmpSvc svc = new EmpSvc();
             rt = svc.EmpDelete(request);
 
        	 if ( rt > 0){
-    		 request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
-    		 RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/src/emp_select_list.jsp");
+    		 //request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
+    		// RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/src/emp_select_list.jsp");
     		 
     		 response.sendRedirect("emplist.do");
        	     }
@@ -149,15 +176,25 @@ public class EmpController extends HttpServlet {
         	    } 	 else
         	       {
                   logger.info("rt : " + rt);
-        	    	 RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
+                  
+         		    out.println("<script language='javascript'>");
+         		    out.println("alert('아이디 또는 패스워드가 틀립니다..');");
+         		 //out.println("document.location.href='emplist.do'");
+         		    out.println("history.back();");
+         		    out.println("</script>");
+        	    	 //RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
               	 //rd.forward(request, response);
-        	    	 response.sendRedirect("emplogin.do");
+        	    	 //response.sendRedirect("emplogin.do");
         	       }
          }  else if (OperationType.equals("logout")) 
                    {
         	         session.invalidate();
         	         logger.info("Log OUT !!!!! ");
-        	         response.sendRedirect("emplogin.do");                   
+          		    out.println("<script language='javascript'>");
+          		    out.println("alert('정상적으로 로그아웃 처리 되었습니다.');");
+          		    out.println("document.location.href='emplist.do'");
+          		    //out.println("history.back();");
+          		    out.println("</script>");                 
                     } 
         	 
          }

@@ -1,17 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-<%@ page import="com.rp.emp.EmpSvc" %>
 <%@ page import="com.rp.emp.EmpDto" %>
 <%
-request.setCharacterEncoding("utf-8");
-//String seq = request.getParameter("seq");
 
-//Resultset 선언
-
-EmpSvc svc = new EmpSvc();
-EmpDto al = null;
-al = svc.selectDetail(request);
+EmpDto al = (EmpDto)request.getAttribute("detail");
      
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/htmle4/loose.dtd">
@@ -23,9 +16,7 @@ al = svc.selectDetail(request);
     function modify(seq){
         alert(seq);
         document.location.href="empModify.do?OperationType=EmpUpdate_form&seq=" + seq;
-        //document.location.href="emp.do?OperationType=EmpUpdate&seq=" + seq;
     }
-     
     function delData(seq){
        document.location.href="empDelete.do?OperationType=EmpDelete&seq=" + seq;
     }
@@ -53,16 +44,20 @@ al = svc.selectDetail(request);
       <td><%=al.getPasswd()%></td>
   </tr>
   <tr>
-      <td>First Name</td>
+      <td>성</td>
       <td><%=al.getFirst()%></td>
   </tr>
   <tr>
-      <td>Last Name</td>
+      <td>이름</td>
       <td><%=al.getLast()%></td>
   </tr>
   <tr>
-      <td>Age</td>
+      <td>나이</td>
       <td><%=al.getAge()%></td>
+  </tr>
+    <tr>
+      <td>부서</td>
+      <td><%=al.getDept()%></td>
   </tr>
   <tr>
       <td colspan=2>

@@ -1,13 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="com.rp.emp.EmpSvc" %>
 <%@ page import="com.rp.emp.EmpDto" %>
 <%
 
-EmpDto al = null;
-EmpSvc svc = new EmpSvc();
-al = svc.selectDetail(request);
-
+EmpDto al = (EmpDto)request.getAttribute("detail");
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -53,6 +49,16 @@ al = svc.selectDetail(request);
   <tr>
       <td>나이</td>
       <td><input name="age"  value="<%=al.getAge()%>"></td>
+  </tr>
+    <tr>
+  	   <td>부서</td>
+  	   <td>
+  	   <select name="dept_seq">
+            <option value="1">미들웨어</option>
+            <option value="2">DB1</option>
+            <option value="3">플랫폼</option>
+        </select>
+  	   </td>
   </tr>
   <tr>
       <td colspan=3>

@@ -1,6 +1,5 @@
 package com.rp.emp;
 import java.beans.PropertyVetoException;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
@@ -8,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.rp.DBUtil;
@@ -36,11 +37,10 @@ public class EmpDao {
          
         String search_type = request.getParameter("search_type");
         String search_string = request.getParameter("search_string");
-        
+              
+         /*
         System.out.println("search_type = " + search_type);
         System.out.println("search_string = " + search_string);
-       
-         /*
         String search_type = request.getParameter("search_type");
         String search_string = "";
         if (request.getParameter("search_string") != null) {
@@ -58,10 +58,12 @@ public class EmpDao {
         sb.append("      passwd                         ,\n");       
         sb.append("      first                      ,\n");       
         sb.append("      last                       ,\n");       
-        sb.append("      age                        \n");       
-        sb.append(" FROM emp                        \n"); 
+        sb.append("      age                        ,\n");
+        sb.append("      emp_dept.dept_nm                        \n");
+        sb.append(" FROM emp,emp_dept                        \n"); 
         sb.append(" where      1=1                  \n");
-         
+        sb.append(" and   emp.dept_seq = emp_dept.dept_seq   \n");
+        
         if ( search_string != null) {
             if (search_type.equals("id")) {
                 sb.append(" and id = ?                    \n"); 
@@ -71,9 +73,11 @@ public class EmpDao {
                 sb.append(" and last = ?                    \n");
             } else if (search_type.equals("age")) {
                 sb.append(" and age = ?                    \n");
+            } else if (search_type.equals("dept_nm")) {
+                sb.append(" and emp_dept.dept_nm = ?                \n");
             }
         }
-         
+
         // INFO 레벨로 로그출력
         logger.info("sql=" + sb.toString());
         logger.info("search_string=" + search_string);
@@ -100,12 +104,12 @@ public class EmpDao {
                 dto.setFirst(rs.getString("first"));
                 dto.setLast(rs.getString("last"));
                 dto.setAge(rs.getInt("age"));
+                dto.setDept(rs.getString("dept_nm"));
                 al.add(dto);
                  
-            }
-             
+            }             
         } catch (SQLException e){
-            e.printStackTrace();
+            e.printStackTrace(System.out);
              
         } finally {
             //관련자원 닫기
@@ -133,9 +137,11 @@ public class EmpDao {
         sb.append("      passwd                      ,\n");       
         sb.append("      first                      ,\n");       
         sb.append("      last                       ,\n");       
-        sb.append("      age                        \n");       
-        sb.append(" FROM emp                        \n"); 
+        sb.append("      age                        ,\n");       
+        sb.append("      emp_dept.dept_nm           \n");
+        sb.append(" FROM emp,emp_dept                        \n"); 
         sb.append(" where      seq = ?                  \n");
+        sb.append(" and   emp.dept_seq = emp_dept.dept_seq   \n");
         
         // INFO 레벨로 로그출력
         logger.info("sql = " + sb.toString());
@@ -156,6 +162,7 @@ public class EmpDao {
             dto.setFirst(rs.getString("first"));
             dto.setLast(rs.getString("last"));
             dto.setAge(Integer.parseInt(rs.getString("age")));
+            dto.setDept(rs.getString("dept_nm"));
              
         } catch (SQLException e){
             e.printStackTrace();
@@ -169,13 +176,7 @@ public class EmpDao {
      
 public int insertEMP(HttpServletRequest request, Connection conn) {
          int rt = 0;
-           
-         String first = "";
-         String last = "";
-         
-         first = request.getParameter("first");
-         last = request.getParameter("last");
-         
+          
         PreparedStatement pstmt = null;
          
         LogUtil.LogRequestParams(request);
@@ -187,9 +188,11 @@ public int insertEMP(HttpServletRequest request, Connection conn) {
         sb.append("      passwd                     ,\n");       
         sb.append("      first                      ,\n");       
         sb.append("      last                       ,\n");       
-        sb.append("      age                        \n");       
+        sb.append("      age                        ,\n");
+        sb.append("      dept_seq                     \n");
         sb.append(" )                               \n"); 
-        sb.append(" values (?,?,?,?,?)                   \n");
+        sb.append(" values (?,?,?,?,?,?)             \n");
+           
          
         // INFO 레벨로 로그출력
         logger.info("sql = " + sb.toString());
@@ -200,10 +203,11 @@ public int insertEMP(HttpServletRequest request, Connection conn) {
             pstmt = conn.prepareStatement(sb.toString());
             pstmt.setString( 1, request.getParameter("id"));
             pstmt.setString( 2, request.getParameter("passwd"));
-            pstmt.setString( 3, first);
-            pstmt.setString( 4, last);
-            pstmt.setString( 5, request.getParameter("age"));          
-             
+            pstmt.setString( 3, request.getParameter("first"));
+            pstmt.setString( 4, request.getParameter("last"));
+            pstmt.setString( 5, request.getParameter("age"));  
+            pstmt.setString( 6, request.getParameter("dept_seq"));           
+
             //쿼리실행
             rt = pstmt.executeUpdate();          
              
@@ -227,6 +231,7 @@ public int EmpUpdate(HttpServletRequest request, Connection conn) throws SQLExce
     String first = request.getParameter("first");
     String last = request.getParameter("last");
     int age = Integer.parseInt(request.getParameter("age"));
+    int dept_seq = Integer.parseInt(request.getParameter("dept_seq"));
         
   
         //PreparedStatement 선언
@@ -239,7 +244,8 @@ public int EmpUpdate(HttpServletRequest request, Connection conn) throws SQLExce
         sb.append("      passwd = ?,                     \n");   
         sb.append("      first = ?,                     \n");       
         sb.append("      last  = ?,                     \n");       
-        sb.append("      age  = ?                       \n");       
+        sb.append("      age  = ?,                       \n"); 
+        sb.append("      dept_seq = ?                     \n");
         sb.append(" where seq = ?                       \n"); 
                
         // INFO 레벨로 로그출력
@@ -249,6 +255,7 @@ public int EmpUpdate(HttpServletRequest request, Connection conn) throws SQLExce
         logger.info("first = " + first);
         logger.info("last = " + last);
         logger.info("age = " + age);
+        logger.info("dept_seq = " + dept_seq);
       
         //파라미터 바인딩
         try {  
@@ -258,11 +265,14 @@ public int EmpUpdate(HttpServletRequest request, Connection conn) throws SQLExce
         pstmt.setString( 2, first);
         pstmt.setString( 3, last);
         pstmt.setInt( 4, age);
-        pstmt.setInt( 5, seq);
-                  
+        pstmt.setInt( 5, dept_seq);
+        pstmt.setInt( 6, seq);
+                
         //쿼리실행
         //pstmt.executeUpdate();
         rt = pstmt.executeUpdate();
+        
+        logger.info("rt = " + rt);
 
 		} catch (SQLException e){
 				e.printStackTrace();

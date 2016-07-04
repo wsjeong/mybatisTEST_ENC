@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import com.rp.DBUtil;
 import com.rp.db.MyDataSource;
+
 public class EmpSvc {
 	 public ArrayList<EmpDto> getEmpList(HttpServletRequest request) {
 	        Connection conn = null;
@@ -16,7 +17,9 @@ public class EmpSvc {
             conn.setAutoCommit(false);
              
             EmpDao dao = new EmpDao();
-            al = dao.selectEMPlist(request, conn);          
+            al = dao.selectEMPlist(request, conn);    
+            
+           // System.out.println("svc========================================" + al.size());
       
             // Transaction 종료
             conn.commit();

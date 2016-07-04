@@ -2,8 +2,7 @@
    pageEncoding="UTF-8" %>
 <%@ page import="java.util.*" %>
 <%@ page import="com.rp.emp.EmpDto" %>
-<%@ page import="com.rp.emp.EmpSvc" %>
-<%@ page import="com.rp.emp.EmpController" %>
+
 <%--
 <jsp:useBean id="svc" class="com.rp.emp.EmpSvc" scope="page"/>
  --%>
@@ -45,6 +44,7 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
             <option value="first">성</option>
             <option value="last">이름</option>
             <option value="age">나이</option>
+            <option value="dept_nm">부서</option>
         </select>
         <input type="text" name="search_string" value="<%=search_string%>">
         <input type="button" value="조회" onClick="search_data();">
@@ -53,11 +53,13 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
    <h2 class="sub-header"> 사원목록 </h2> <br>
     <table class="table table-striped">
     <tr>
-        <th width="10%">ID</th><th width="25%">First</th><th width="40%">last</th><th width="25%">age</th>
+    <!-- 
+        <th width="10%">ID</th><th width="25%">First</th><th width="40%">last</th><th width="25%">age</th><th width="25%">부서</th>
+         -->
+         <th>ID</th><th>First</th><th>last</th><th>age</th><th>부서</th>
     </tr>
     <%
     //Result Set Fetch
-    
     for (int i=0; i < al.size(); i++){
         al.get(i).getAge();
       %>
@@ -66,17 +68,18 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
           <td><%=al.get(i).getFirst()%></td>
           <td><%=al.get(i).getLast()%></td>
           <td><%=al.get(i).getAge()%></td>
+          <td><%=al.get(i).getDept()%></td>
       </tr>
     <%
     }
     
     %>
-      <tr><td colspan="4"><input type="button" value="새로생성" onclick="javascript:window.document.location.href='emp.do?OperationType=EmpInsert_form'"></td></tr>
+      <tr><td colspan="5"><input type="button" value="새로생성" onclick="javascript:window.document.location.href='emp.do?OperationType=EmpInsert_form'"></td></tr>
    </table>
   </div>
   </div>
   </div>
   <jsp:include page="${contextPath}/inc/footer.jsp"></jsp:include>
-    </body>
-    </html>
+ </body>
+</html>
 
