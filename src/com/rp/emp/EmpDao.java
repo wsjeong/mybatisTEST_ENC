@@ -31,13 +31,16 @@ public class EmpDao {
         }
     }
     
-	public ArrayList<EmpDto> selectEMPlist(HttpServletRequest request, Connection conn) throws UnsupportedEncodingException {		
+	public ArrayList<EmpDto> selectEMPlist(EmpSearchDto sdto, Connection conn) throws UnsupportedEncodingException {		
         
 		 ResultSet rs = null;
         PreparedStatement pstmt = null;
          
-        String search_type = request.getParameter("search_type");
-        String search_string = request.getParameter("search_string");
+        String search_type = sdto.getSearch_type();
+        String search_string = sdto.getSearch_string();
+        
+        System.out.println("## search_type = " + search_type);
+        System.out.println("## search_string = " + search_string);
               
          /*
         System.out.println("search_type = " + search_type);

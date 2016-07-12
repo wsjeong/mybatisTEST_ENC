@@ -15,10 +15,10 @@ EmpDto al = (EmpDto)request.getAttribute("detail");
 <script language="javascript">
     function modify(seq){
         alert(seq);
-        document.location.href="empModify.do?OperationType=EmpUpdate_form&seq=" + seq;
+        document.location.href="update_emp_form.do?seq=" + seq;
     }
     function delData(seq){
-       document.location.href="empDelete.do?OperationType=EmpDelete&seq=" + seq;
+       document.location.href="delete_emp.do?seq=" + seq;
     }
 </script>
 </head>

@@ -15,7 +15,7 @@
         <jsp:include page="${contextPath}/inc/left.jsp"></jsp:include>
         
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-<form name="new_form" method="post" action="emp.do">
+<form name="new_form" method="post" action="insert_emp.do">
 <table class="table table-striped">
   <tr>
     <th width="10%">구분</th><th width="25%">입력값</th>
@@ -53,7 +53,6 @@
   <tr>
       <td colspan=2>
       <input type="submit" value="입력">
-      <input type="hidden" name="OperationType" value="EmpInsert">
       </td>                   
   </tr>
 

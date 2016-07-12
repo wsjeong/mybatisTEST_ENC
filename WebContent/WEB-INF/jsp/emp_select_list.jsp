@@ -38,7 +38,7 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
         
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         
-    <form name="search_form" method="post" action="emplist.do">
+    <form name="search_form" method="post" action="select_emp_list.do">
         <select name="search_type">
             <option value="id">ID</option>
             <option value="first">성</option>
@@ -64,7 +64,7 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
         al.get(i).getAge();
       %>
       <tr>
-          <td><a href="emp.do?OperationType=empDetail&seq=<%=al.get(i).getSeq()%>"><%=al.get(i).getId()%></a></td>
+          <td><a href="select_emp_detail.do?seq=<%=al.get(i).getSeq()%>"><%=al.get(i).getId()%></a></td>
           <td><%=al.get(i).getFirst()%></td>
           <td><%=al.get(i).getLast()%></td>
           <td><%=al.get(i).getAge()%></td>
@@ -74,7 +74,7 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
     }
     
     %>
-      <tr><td colspan="5"><input type="button" value="새로생성" onclick="javascript:window.document.location.href='emp.do?OperationType=EmpInsert_form'"></td></tr>
+      <tr><td colspan="5"><input type="button" value="새로생성" onclick="javascript:window.document.location.href='insert_emp_form.do'"></td></tr>
    </table>
   </div>
   </div>

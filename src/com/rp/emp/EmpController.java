@@ -31,28 +31,44 @@ public class EmpController extends HttpServlet {
      */
     public EmpController() {
         super();
-        // TODO Auto-generated constructor stub
+    
     }
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stubimport java.sql.ResultSet;
+       
         doPost(request, response);  
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
+       
          
 		 response.setCharacterEncoding("UTF-8");
 		 response.setContentType("text/html; charset=UTF-8");
 		 
 		 PrintWriter out = response.getWriter();
 		 
-        //response.getWriter().append("Served at: ").append(request.getContextPath());
         HttpSession session = request.getSession();
         
-        logger.info("controller ############################################"); 
-      //Operation Type
-        String OperationType = request.getParameter("OperationType");
+        EmpSearchDto sdto = new EmpSearchDto();
+        sdto.setSearch_type(request.getParameter("search_type"));
+        sdto.setSearch_string(request.getParameter("search_string"));
         
-        if (session.getAttribute("id") == null &&  !"emplogin".equals(OperationType) )
+        //RequestURI 구하기
+        String command = request.getRequestURI();        // /jdbc-sample-mvc/login/login.do
+        if (command.indexOf(request.getContextPath()) == 0) {       
+            command = command.substring(request.getContextPath().length()); // /hello.do
+        }
+        System.out.println("command = " + command + " : ");
+        
+        int rt =0;        
+
+         
+        logger.info("controller ############################################"); 
+        
+        /*
+         * Login 설
+         */
+       // String OperationType = request.getParameter("OperationType");
+        
+        if (session.getAttribute("id") == null &&  !("/login_emp.do").equals(command) )
         {
         	RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
         	System.out.println("senssion null!!!!!!!");
@@ -62,29 +78,21 @@ public class EmpController extends HttpServlet {
         } else {
         	System.out.println("senssion not null!!!!!!!");
                 
-        int rt =0;
         
-        if (OperationType == null) {
+        
+        if (("/select_emp_list.do").equals(command)) {
         	
-            logger.info("OperationType = " + OperationType);
+            //logger.info("OperationType = " + OperationType);
         	
         	  EmpSvc svc = new EmpSvc();
-            request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
+            request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(sdto));
+            
             RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
             
             rd.forward(request, response);
             
-        } else if (OperationType.equals("SearchList")) {
-        	 logger.info("OperationType = " + OperationType);
-        	 
-        	  EmpSvc svc = new EmpSvc();
-            request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
-            RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
-             
-            rd.forward(request, response);
-            
-        } else if (OperationType.equals("empDetail")) {
-        	  logger.info("OperationType = " + OperationType);
+        } else if (("/select_emp_detail.do").equals(command)) {
+        	//  logger.info("OperationType = " + OperationType);
         	
         	  EmpSvc svc = new EmpSvc();
             request.setAttribute("detail",(EmpDto)svc.selectDetail(request));    	   
@@ -92,14 +100,13 @@ public class EmpController extends HttpServlet {
            
             rd.forward(request, response);
             
-         } else if (OperationType.equals("EmpInsert_form")) {
-        	 logger.info("OperationType = " + OperationType);
+         } else if (("/insert_emp_form.do").equals(command)) {
+        	 //logger.info("OperationType = " + OperationType);
         	 
            RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_insert_form.jsp");
            rd.forward(request, response);
         
-        } else if (OperationType.equals("EmpInsert")) {
-       	 logger.info("OperationType = " + OperationType);
+        } else if (("/insert_emp.do").equals(command)) {
        	 
         	 EmpSvc svc = new EmpSvc();
         	 rt = svc.addEmp(request);
@@ -107,7 +114,7 @@ public class EmpController extends HttpServlet {
         	 if ( rt > 0){
         		// request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
         		// RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
-        		 response.sendRedirect("emplist.do");
+        		 response.sendRedirect("select_emp_list.do");
         	 } 	else {       		 
         		// PrintWriter out = response.getWriter();
         		 
@@ -117,8 +124,7 @@ public class EmpController extends HttpServlet {
         		 out.println("history.back();");
         		 out.println("</script>");
         	 }
-         } else if (OperationType.equals("EmpUpdate_form")) {
-        	 logger.info("OperationType = " + OperationType);
+         } else if (("/update_emp_form.do").equals(command)) {
         	 
       	     EmpSvc svc = new EmpSvc();
         	 request.setAttribute("detail",(EmpDto)svc.selectDetail(request)); 
@@ -126,28 +132,24 @@ public class EmpController extends HttpServlet {
             
       	     rd.forward(request, response);
            //response.sendRedirect("emp.do");
-        } else if (OperationType.equals("EmpUpdate")) {
-        	logger.info("OperationType = " + OperationType);
-        	
+        } else if (("/update_emp.do").equals(command)) {
+
             EmpSvc svc = new EmpSvc();
             rt = svc.EmpUpdate(request);
      	     
           	 if ( rt > 0){
-        		// request.setAttribute("list",(ArrayList<EmpDto>)svc.getEmpList(request));
         		 RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
         		 
-        		 response.sendRedirect("emplist.do");
+        		 response.sendRedirect("select_emp_list.do");
           	 } 	else {       		 
         		 //PrintWriter out = response.getWriter();
         		 
         		 out.println("<script language='javascript'>");
         		 out.println("alert('정상적으로 처리 되지 않았습니다.');");
-        		 //out.println("document.location.href='emplist.do'");
         		 out.println("history.back();");
         		 out.println("</script>");
         	 } 	
-        } else if (OperationType.equals("EmpDelete")) {    
-        	 logger.info("OperationType = " + OperationType);
+        } else if (("/delete_emp.do").equals(command)) {    
         	
             EmpSvc svc = new EmpSvc();
             rt = svc.EmpDelete(request);
@@ -158,7 +160,7 @@ public class EmpController extends HttpServlet {
     		 
     		 response.sendRedirect("emplist.do");
        	     }
-    	 } else if (OperationType.equals("emplogin")) {       	 
+    	 } else if (("/login_emp.do").equals(command)) {       	 
         	 EmpSvc svc = new EmpSvc();
         	 EmpDto dto = new EmpDto();
         	 rt = svc.EmpLogin(request);
@@ -172,7 +174,7 @@ public class EmpController extends HttpServlet {
         		    RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_select_list.jsp");
                  
         		   //rd.forward(request, response);
-        		   response.sendRedirect("emplist.do");
+        		   response.sendRedirect("select_emp_list.do");
         		        
         	    } 	 else
         	       {
@@ -187,7 +189,7 @@ public class EmpController extends HttpServlet {
               	 //rd.forward(request, response);
         	    	 //response.sendRedirect("emplogin.do");
         	       }
-         }  else if (OperationType.equals("logout")) 
+         }  else if (("/logout_emp.do").equals(command)) 
                    {
         	         session.invalidate();
         	         logger.info("Log OUT !!!!! ");
@@ -200,5 +202,5 @@ public class EmpController extends HttpServlet {
         	 
          }
        }
-     }
+} 
 

@@ -17,8 +17,7 @@
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
     <div align="center"><img src="img/jboss_middleware1.jpg" width=1000 height=300>
-    <form name="Login" method="post" action="emplist.do"><br/>
-    <input type="hidden" name="OperationType" value="emplogin">
+    <form name="Login" method="post" action="login_emp.do"><br/>
     <br><br>
     <table class="table table-striped">
        <tr>

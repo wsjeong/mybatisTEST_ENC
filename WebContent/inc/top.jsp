@@ -16,7 +16,7 @@
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
-            <li><a href="/mvcTEST/login.do?OperationType=logout">
+            <li><a href="/mvcDTEST/logout_emp.do?">
              <%
              if (session.getAttribute("id") != null ) {
             	   out.println("Logout");

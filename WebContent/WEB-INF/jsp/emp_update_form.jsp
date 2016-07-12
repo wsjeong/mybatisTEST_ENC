@@ -20,9 +20,8 @@ EmpDto al = (EmpDto)request.getAttribute("detail");
         
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-<form name="detail_form" method="post" action="empUpdate.do">
+<form name="detail_form" method="post" action="update_emp.do">
 <input type="hidden" name="seq" value="<%=al.getSeq()%>">
-<input type="hidden" name="OperationType" value="EmpUpdate">
 <table class="table table-striped">
   <tr>
      <!-- 

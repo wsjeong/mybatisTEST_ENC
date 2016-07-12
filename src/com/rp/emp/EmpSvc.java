@@ -7,7 +7,7 @@ import com.rp.DBUtil;
 import com.rp.db.MyDataSource;
 
 public class EmpSvc {
-	 public ArrayList<EmpDto> getEmpList(HttpServletRequest request) {
+	 public ArrayList<EmpDto> getEmpList(EmpSearchDto sdto) {
 	        Connection conn = null;
 	        ArrayList<EmpDto> al = null;
 	                           
@@ -17,7 +17,7 @@ public class EmpSvc {
             conn.setAutoCommit(false);
              
             EmpDao dao = new EmpDao();
-            al = dao.selectEMPlist(request, conn);    
+            al = dao.selectEMPlist(sdto, conn);    
             
            // System.out.println("svc========================================" + al.size());
       
@@ -216,5 +216,6 @@ public class EmpSvc {
         }
         return rt;
     }
+
     
 }
