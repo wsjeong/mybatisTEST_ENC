@@ -66,7 +66,7 @@ EmpDto al = (EmpDto)request.getAttribute("detail");
       </td>
        
   </tr>
-   </div>
+</div>
 </div>
 </div>
 <jsp:include page="${contextPath}/inc/footer.jsp"></jsp:include>

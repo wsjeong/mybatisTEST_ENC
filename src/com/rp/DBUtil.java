@@ -4,6 +4,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 public class DBUtil {
+/*	
     public static Connection getConnection() {
         //DB연결
         Connection conn = null;
@@ -19,7 +20,7 @@ public class DBUtil {
             e.printStackTrace();
         }
         return conn;
-    }
+    }*/
      
     public static void closeConnection(Connection conn){
         if (conn != null) { try { conn.close(); } catch  (SQLException e) { e.printStackTrace();}}

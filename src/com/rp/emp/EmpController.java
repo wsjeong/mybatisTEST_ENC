@@ -42,6 +42,7 @@ public class EmpController extends HttpServlet {
          
 		 response.setCharacterEncoding("UTF-8");
 		 response.setContentType("text/html; charset=UTF-8");
+		 
 		 PrintWriter out = response.getWriter();
 		 
         //response.getWriter().append("Served at: ").append(request.getContextPath());
