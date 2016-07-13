@@ -68,7 +68,7 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
           <td><%=al.get(i).getFirst()%></td>
           <td><%=al.get(i).getLast()%></td>
           <td><%=al.get(i).getAge()%></td>
-          <td><%=al.get(i).getDept()%></td>
+          <td><%=al.get(i).getDeptNM()%></td>
       </tr>
     <%
     }

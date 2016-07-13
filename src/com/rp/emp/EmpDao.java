@@ -108,7 +108,7 @@ public class EmpDao {
                 dto.setFirst(rs.getString("first"));
                 dto.setLast(rs.getString("last"));
                 dto.setAge(rs.getInt("age"));
-                dto.setDept(rs.getString("dept_nm"));
+                dto.setDeptNM(rs.getString("dept_nm"));
                 al.add(dto);
                  
             }             
@@ -122,14 +122,14 @@ public class EmpDao {
         return al;
     }
 	
-	public EmpDto selectDetail(HttpServletRequest request, Connection conn) throws SQLException, IOException, PropertyVetoException {
-        EmpDto dto = new EmpDto();
-        String seq = request.getParameter("seq");
-        
-        LogUtil.LogRequestParams(request);
+	public EmpDto selectDetail(EmpDto dto, Connection conn) throws SQLException, IOException, PropertyVetoException {
+         logger.info("EmpDao : selectDetail ========================================");
+		  		
+        //LogUtil.LogRequestParams();
          
         //Resultset 선언
         ResultSet rs = null;
+        
         //PreparedStatement 선언
         PreparedStatement pstmt = null;
          
@@ -149,13 +149,14 @@ public class EmpDao {
         
         // INFO 레벨로 로그출력
         logger.info("sql = " + sb.toString());
-        logger.info("seq =" + seq);
-         
+        logger.info("seq =" + dto.getSeq());
+                
         try {
             //쿼리실행
+        	logger.info("EmpDao : selectDetail : query ========================================");
             pstmt = conn.prepareStatement(sb.toString());
              
-            pstmt.setString( 1, seq);
+            pstmt.setInt( 1, dto.getSeq());
             rs = pstmt.executeQuery();
              
             rs.next();
@@ -166,7 +167,9 @@ public class EmpDao {
             dto.setFirst(rs.getString("first"));
             dto.setLast(rs.getString("last"));
             dto.setAge(Integer.parseInt(rs.getString("age")));
-            dto.setDept(rs.getString("dept_nm"));
+            dto.setDeptNM(rs.getString("dept_nm"));
+            
+            logger.info("EmpDao : selectDetail : End ========================================");
              
         } catch (SQLException e){
             e.printStackTrace();
@@ -178,12 +181,12 @@ public class EmpDao {
         return dto;
     }
      
-public int insertEMP(HttpServletRequest request, Connection conn) {
+public int insertEMP(EmpDto dto, Connection conn) {
          int rt = 0;
           
         PreparedStatement pstmt = null;
-         
-        LogUtil.LogRequestParams(request);
+                         
+        //LogUtil.LogRequestParams(dto);
          
         StringBuffer sb= new StringBuffer("");
          
@@ -205,12 +208,12 @@ public int insertEMP(HttpServletRequest request, Connection conn) {
                           
             //파라미터 바인딩
             pstmt = conn.prepareStatement(sb.toString());
-            pstmt.setString( 1, request.getParameter("id"));
-            pstmt.setString( 2, request.getParameter("passwd"));
-            pstmt.setString( 3, request.getParameter("first"));
-            pstmt.setString( 4, request.getParameter("last"));
-            pstmt.setString( 5, request.getParameter("age"));  
-            pstmt.setString( 6, request.getParameter("dept_seq"));           
+            pstmt.setInt( 1, dto.getId());
+            pstmt.setString( 2, dto.getPasswd());
+            pstmt.setString( 3, dto.getFirst());
+            pstmt.setString( 4, dto.getLast());
+            pstmt.setInt( 5, dto.getAge());  
+            pstmt.setInt( 6, dto.getDeptSeq());           
 
             //쿼리실행
             rt = pstmt.executeUpdate();          
@@ -225,18 +228,18 @@ public int insertEMP(HttpServletRequest request, Connection conn) {
         return rt;
     }
 
-public int EmpUpdate(HttpServletRequest request, Connection conn) throws SQLException, IOException {
+public int EmpUpdate(EmpDto dto, Connection conn) throws SQLException, IOException {
 	
 	int rt = 0;
-	LogUtil.LogRequestParams(request);
+	//LogUtil.LogRequestParams(request);
 	
-    int seq = Integer.parseInt(request.getParameter("seq"));
+/*    int seq = Integer.parseInt(request.getParameter("seq"));
     String passwd = request.getParameter("passwd");
     String first = request.getParameter("first");
     String last = request.getParameter("last");
     int age = Integer.parseInt(request.getParameter("age"));
     int dept_seq = Integer.parseInt(request.getParameter("dept_seq"));
-        
+        */
   
         //PreparedStatement 선언
         PreparedStatement pstmt = null;        
@@ -254,23 +257,23 @@ public int EmpUpdate(HttpServletRequest request, Connection conn) throws SQLExce
                
         // INFO 레벨로 로그출력
         logger.info("sql = " + sb.toString());
-        logger.info("seq = " + seq);
-        logger.info("passwd = " + passwd);
-        logger.info("first = " + first);
-        logger.info("last = " + last);
-        logger.info("age = " + age);
-        logger.info("dept_seq = " + dept_seq);
+        logger.info("seq = " + dto.getSeq());
+        logger.info("passwd = " + dto.getPasswd());
+        logger.info("first = " + dto.getFirst());
+        logger.info("last = " + dto.getLast());
+        logger.info("age = " + dto.getAge());
+        logger.info("dept_seq = " + dto.getDeptSeq());
       
         //파라미터 바인딩
         try {  
         pstmt = conn.prepareStatement(sb.toString());
         
-        pstmt.setString( 1, passwd);
-        pstmt.setString( 2, first);
-        pstmt.setString( 3, last);
-        pstmt.setInt( 4, age);
-        pstmt.setInt( 5, dept_seq);
-        pstmt.setInt( 6, seq);
+        pstmt.setString( 1, dto.getPasswd());
+        pstmt.setString( 2, dto.getFirst());
+        pstmt.setString( 3, dto.getLast());
+        pstmt.setInt( 4, dto.getAge());
+        pstmt.setInt( 5, dto.getDeptSeq());
+        pstmt.setInt( 6, dto.getSeq());
                 
         //쿼리실행
         //pstmt.executeUpdate();
@@ -288,15 +291,16 @@ public int EmpUpdate(HttpServletRequest request, Connection conn) throws SQLExce
 		return rt;
 	}
 
-public int EmpDelete(HttpServletRequest request,Connection conn) throws SQLException, IOException {
-	int rt = 0;
+public int EmpDelete(EmpDto dto,Connection conn) throws SQLException, IOException {
+	   logger.info("EmpDao : EmpDelete : start =====================================");
+	   int rt = 0;
 	
-	LogUtil.LogRequestParams(request);
+	//LogUtil.LogRequestParams(request);
 	
-    int seq = Integer.parseInt(request.getParameter("seq"));
+//    int seq = Integer.parseInt(request.getParameter("seq"));
      
-    //PreparedStatement 선언
-    PreparedStatement pstmt = null;   
+        //PreparedStatement 선언
+        PreparedStatement pstmt = null;   
                
         StringBuffer sb= new StringBuffer("");
         sb.append(" delete from emp                  \n");      
@@ -304,18 +308,20 @@ public int EmpDelete(HttpServletRequest request,Connection conn) throws SQLExcep
         
         // INFO 레벨로 로그출력
         logger.info("sql = " + sb.toString());
-        logger.info("seq = " + seq);
+        logger.info("seq = " + dto.getSeq());
          
         try { 
        //파라미터 바인딩
         pstmt = conn.prepareStatement(sb.toString());
-        pstmt.setInt( 1, seq);
+        pstmt.setInt( 1, dto.getSeq());
         
-        System.out.println(sb.toString());
-        System.out.println("Delete ID =" + seq);
+        logger.info(sb.toString());
+        logger.info("Delete ID =" + dto.getSeq());
         
         //쿼리실행
         rt = pstmt.executeUpdate();
+        
+        logger.info("EmpDao : EmpDelete : END =====================================");
        
 } catch (SQLException e){
 	e.printStackTrace();
@@ -327,13 +333,15 @@ DBUtil.closeConnection(pstmt);
 return rt;
 }
 
-public int  EmpLogin(HttpServletRequest request,Connection conn) throws SQLException, IOException {
+public int  EmpLogin(EmpDto setdto,Connection conn) throws SQLException, IOException {
 	int rt = 0;
 	 
-	LogUtil.LogRequestParams(request);
+	//LogUtil.LogRequestParams(request);
 	
-	String id = request.getParameter("id");
-	String passwd = request.getParameter("passwd");
+	String id = Integer.toString(setdto.getId());
+	String passwd = setdto.getPasswd();
+	
+	logger.info("Login_emp.do : EmpDao ============================");
      
     ///Resultset 선언
 	ResultSet rs = null;

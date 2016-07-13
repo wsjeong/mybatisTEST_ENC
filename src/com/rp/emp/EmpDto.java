@@ -6,7 +6,8 @@ public class EmpDto {
     String first;
     String last;
     int age;
-    String dept;
+    String dept_nm;
+    int dept_seq;
     
     public int getSeq() {
         return seq;
@@ -44,17 +45,22 @@ public class EmpDto {
     public void setAge(int age) {
         this.age = age;
     }
-    public String getDept() {
-        return dept;
+    public String getDeptNM() {
+        return dept_nm;
     }
-    public void setDept(String dept) {
-        this.dept = dept;
+    public void setDeptNM(String dept_nm) {
+        this.dept_nm = dept_nm;
     }
-     
+    public int getDeptSeq() {
+        return dept_seq;
+    }
+    public void setDeptSeq(int dept_seq) {
+        this.dept_seq = dept_seq;
+    } 
     @Override
     public String toString() {
         return "EmpDto [seq=" + seq + ", id=" + id + ", passwd=" + passwd
-                + ", first=" + first + ", last=" + last + ", age=" + age + ",dept=" + dept + "]";
+                + ", first=" + first + ", last=" + last + ", age=" + age + ",dept_nm=" + dept_nm + ",dept_seq=" + dept_seq + "]";
     }
      
      

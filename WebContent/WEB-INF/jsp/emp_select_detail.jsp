@@ -30,7 +30,8 @@ EmpDto al = (EmpDto)request.getAttribute("detail");
         <jsp:include page="${contextPath}/inc/left.jsp"></jsp:include>
         
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-<form name="detail_form" method="get" action="emp.do">
+           <h2 class="sub-header"> 사원 정보 </h2> <br>
+<form name="detail_form" method="post" >
 <table class="table table-striped">
   <tr>
     <th width="10%">구분</th><th width="25%">입력값</th>
@@ -57,7 +58,7 @@ EmpDto al = (EmpDto)request.getAttribute("detail");
   </tr>
     <tr>
       <td>부서</td>
-      <td><%=al.getDept()%></td>
+      <td><%=al.getDeptNM()%></td>
   </tr>
   <tr>
       <td colspan=2>
