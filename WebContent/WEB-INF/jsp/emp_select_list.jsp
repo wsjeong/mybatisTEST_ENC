@@ -56,7 +56,7 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
     <!-- 
         <th width="10%">ID</th><th width="25%">First</th><th width="40%">last</th><th width="25%">age</th><th width="25%">부서</th>
          -->
-         <th>ID</th><th>First</th><th>last</th><th>age</th><th>부서</th>
+         <th>ID</th><th>성</th><th>이름</th><th>나이</th><th>부서</th>
     </tr>
     <%
     //Result Set Fetch

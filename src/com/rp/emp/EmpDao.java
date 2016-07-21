@@ -1,6 +1,5 @@
 package com.rp.emp;
 import java.beans.PropertyVetoException;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
@@ -8,20 +7,25 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
+
+import com.ibatis.sqlmap.client.SqlMapClient;
 import com.rp.DBUtil;
-import com.rp.LogUtil;
-//import com.rp.db.MyDataSource;
 import com.rp.emp.EmpDto;
 
 public class EmpDao {  
 	final static Logger logger = Logger.getLogger(EmpDao.class);
     private static EmpDao dao;
     
+    int rt = 0;
+	 Object obj = null;
+	 EmpDto dto = new EmpDto();
+    
+    // Dao Instance 싱글톤
     public static EmpDao getInstance() {
         if (dao == null) {
             dao = new EmpDao();
@@ -31,362 +35,76 @@ public class EmpDao {
         }
     }
     
-	public ArrayList<EmpDto> selectEMPlist(EmpSearchDto sdto, Connection conn) throws UnsupportedEncodingException {		
+    // Emp 데이터 조회
+	public ArrayList<EmpDto> selectEMPlist(EmpSearchDto sdto, SqlMapClient sqlMapper) throws SQLException {		
         
-		 ResultSet rs = null;
-        PreparedStatement pstmt = null;
-         
-        String search_type = sdto.getSearch_type();
-        String search_string = sdto.getSearch_string();
+        // Query ID 만 넘겨주면 해당 쿼리를 실행하여 데이터 조회
+		ArrayList<EmpDto> list =  (ArrayList<EmpDto>) sqlMapper.queryForList("selectEmpList", sdto);
         
-        System.out.println("## search_type = " + search_type);
-        System.out.println("## search_string = " + search_string);
-              
-         /*
-        System.out.println("search_type = " + search_type);
-        System.out.println("search_string = " + search_string);
-        String search_type = request.getParameter("search_type");
-        String search_string = "";
-        if (request.getParameter("search_string") != null) {
-           search_string = request.getParameter("search_string");
-         }
-         */
-
-        ArrayList<EmpDto> al = new ArrayList<EmpDto>();
-               
-        StringBuffer sb= new StringBuffer("");
-         
-        sb.append(" SELECT                          \n");      
-        sb.append("      seq                         ,\n");       
-        sb.append("      id                         ,\n");       
-        sb.append("      passwd                         ,\n");       
-        sb.append("      first                      ,\n");       
-        sb.append("      last                       ,\n");       
-        sb.append("      age                        ,\n");
-        sb.append("      emp_dept.dept_nm                        \n");
-        sb.append(" FROM emp,emp_dept                        \n"); 
-        sb.append(" where      1=1                  \n");
-        sb.append(" and   emp.dept_seq = emp_dept.dept_seq   \n");
-        
-        if ( search_string != null) {
-            if (search_type.equals("id")) {
-                sb.append(" and id = ?                    \n"); 
-            } else if (search_type.equals("first")) {
-                sb.append(" and first = ?                    \n");
-            } else if (search_type.equals("last")) {
-                sb.append(" and last = ?                    \n");
-            } else if (search_type.equals("age")) {
-                sb.append(" and age = ?                    \n");
-            } else if (search_type.equals("dept_nm")) {
-                sb.append(" and emp_dept.dept_nm = ?                \n");
-            }
-        }
-
-        // INFO 레벨로 로그출력
-        logger.info("sql=" + sb.toString());
-        logger.info("search_string=" + search_string);
-        logger.info("search_type=" + search_type);
-                 
-        try {
-           
-            //쿼리준비
-            pstmt = conn.prepareStatement(sb.toString());
-                         
-            if ( search_string != null) {
-                // Parameter 바인딩
-                pstmt.setString( 1, search_string);
-            }
-             
-            //쿼리실행
-            rs = pstmt.executeQuery();
-             
-            while (rs.next()){
-                EmpDto dto = new EmpDto();
-                dto.setSeq(rs.getInt("seq"));
-                dto.setId(rs.getInt("id"));
-                dto.setPasswd(rs.getString("passwd"));
-                dto.setFirst(rs.getString("first"));
-                dto.setLast(rs.getString("last"));
-                dto.setAge(rs.getInt("age"));
-                dto.setDeptNM(rs.getString("dept_nm"));
-                al.add(dto);
-                 
-            }             
-        } catch (SQLException e){
-            e.printStackTrace(System.out);
-             
-        } finally {
-            //관련자원 닫기
-            DBUtil.closeConnection(pstmt);
-        }
-        return al;
+       return list; 
     }
 	
-	public EmpDto selectDetail(EmpDto dto, Connection conn) throws SQLException, IOException, PropertyVetoException {
-         logger.info("EmpDao : selectDetail ========================================");
-		  		
-        //LogUtil.LogRequestParams();
+	public EmpDto selectDetail(EmpDto dto, SqlMapClient sqlMapper) throws SQLException, IOException, PropertyVetoException {
+         logger.info("##########  EmpDao : selectDetail ========================================");
          
-        //Resultset 선언
-        ResultSet rs = null;
-        
-        //PreparedStatement 선언
-        PreparedStatement pstmt = null;
+         EmpDto detail_dto =  (EmpDto) sqlMapper.queryForObject("selectDetail", dto);
          
-        //Query작성
-        StringBuffer sb= new StringBuffer("");
-        sb.append(" SELECT                          \n");      
-        sb.append("      seq                         ,\n");       
-        sb.append("      id                         ,\n");       
-        sb.append("      passwd                      ,\n");       
-        sb.append("      first                      ,\n");       
-        sb.append("      last                       ,\n");       
-        sb.append("      age                        ,\n");       
-        sb.append("      emp_dept.dept_nm           \n");
-        sb.append(" FROM emp,emp_dept                        \n"); 
-        sb.append(" where      seq = ?                  \n");
-        sb.append(" and   emp.dept_seq = emp_dept.dept_seq   \n");
-        
-        // INFO 레벨로 로그출력
-        logger.info("sql = " + sb.toString());
-        logger.info("seq =" + dto.getSeq());
-                
-        try {
-            //쿼리실행
-        	logger.info("EmpDao : selectDetail : query ========================================");
-            pstmt = conn.prepareStatement(sb.toString());
-             
-            pstmt.setInt( 1, dto.getSeq());
-            rs = pstmt.executeQuery();
-             
-            rs.next();
-             
-            dto.setSeq(Integer.parseInt(rs.getString("seq")));
-            dto.setId(Integer.parseInt(rs.getString("id")));
-            dto.setPasswd(rs.getString("passwd"));
-            dto.setFirst(rs.getString("first"));
-            dto.setLast(rs.getString("last"));
-            dto.setAge(Integer.parseInt(rs.getString("age")));
-            dto.setDeptNM(rs.getString("dept_nm"));
-            
-            logger.info("EmpDao : selectDetail : End ========================================");
-             
-        } catch (SQLException e){
-            e.printStackTrace();
-             
-        } finally {
-            //관련자원 닫기
-            DBUtil.closeConnection(pstmt);
-        }
-        return dto;
+        // logger.info("##########  EmpDao : Return list :" + list);
+         
+        return detail_dto;
     }
      
-public int insertEMP(EmpDto dto, Connection conn) {
-         int rt = 0;
-          
-        PreparedStatement pstmt = null;
-                         
-        //LogUtil.LogRequestParams(dto);
-         
-        StringBuffer sb= new StringBuffer("");
-         
-        sb.append(" insert into emp (                  \n");      
-        sb.append("      id                         ,\n");       
-        sb.append("      passwd                     ,\n");       
-        sb.append("      first                      ,\n");       
-        sb.append("      last                       ,\n");       
-        sb.append("      age                        ,\n");
-        sb.append("      dept_seq                     \n");
-        sb.append(" )                               \n"); 
-        sb.append(" values (?,?,?,?,?,?)             \n");
-           
-         
-        // INFO 레벨로 로그출력
-        logger.info("sql = " + sb.toString());
-         
-        try {
-                          
-            //파라미터 바인딩
-            pstmt = conn.prepareStatement(sb.toString());
-            pstmt.setInt( 1, dto.getId());
-            pstmt.setString( 2, dto.getPasswd());
-            pstmt.setString( 3, dto.getFirst());
-            pstmt.setString( 4, dto.getLast());
-            pstmt.setInt( 5, dto.getAge());  
-            pstmt.setInt( 6, dto.getDeptSeq());           
-
-            //쿼리실행
-            rt = pstmt.executeUpdate();          
-             
-        } catch (SQLException e){
-            e.printStackTrace();
-             
-        } finally {
-            //관련자원 닫기
-            DBUtil.closeConnection(pstmt);
-        }
-        return rt;
+	public Object insertEMP(EmpDto dto, SqlMapClient sqlMapper) throws SQLException {
+		 logger.info("##########  EmpDao : insertEMP ========================================");
+		 
+	     obj = sqlMapper.insert("insertEmp", dto);
+	     
+	     logger.info("##########  EmpDao : Return obj : " + obj);	
+        logger.info("getName: {}"+ obj.getClass().getName());
+        logger.info("id: {}"+ obj.toString());
+       
+        return obj;
     }
 
-public int EmpUpdate(EmpDto dto, Connection conn) throws SQLException, IOException {
-	
-	int rt = 0;
-	//LogUtil.LogRequestParams(request);
-	
-/*    int seq = Integer.parseInt(request.getParameter("seq"));
-    String passwd = request.getParameter("passwd");
-    String first = request.getParameter("first");
-    String last = request.getParameter("last");
-    int age = Integer.parseInt(request.getParameter("age"));
-    int dept_seq = Integer.parseInt(request.getParameter("dept_seq"));
-        */
-  
-        //PreparedStatement 선언
-        PreparedStatement pstmt = null;        
-         
-        StringBuffer sb= new StringBuffer("");
-        
-        sb.append(" update emp                  \n");      
-        sb.append("      set                          \n");      
-        sb.append("      passwd = ?,                     \n");   
-        sb.append("      first = ?,                     \n");       
-        sb.append("      last  = ?,                     \n");       
-        sb.append("      age  = ?,                       \n"); 
-        sb.append("      dept_seq = ?                     \n");
-        sb.append(" where seq = ?                       \n"); 
-               
-        // INFO 레벨로 로그출력
-        logger.info("sql = " + sb.toString());
-        logger.info("seq = " + dto.getSeq());
-        logger.info("passwd = " + dto.getPasswd());
-        logger.info("first = " + dto.getFirst());
-        logger.info("last = " + dto.getLast());
-        logger.info("age = " + dto.getAge());
-        logger.info("dept_seq = " + dto.getDeptSeq());
-      
-        //파라미터 바인딩
-        try {  
-        pstmt = conn.prepareStatement(sb.toString());
-        
-        pstmt.setString( 1, dto.getPasswd());
-        pstmt.setString( 2, dto.getFirst());
-        pstmt.setString( 3, dto.getLast());
-        pstmt.setInt( 4, dto.getAge());
-        pstmt.setInt( 5, dto.getDeptSeq());
-        pstmt.setInt( 6, dto.getSeq());
-                
-        //쿼리실행
-        //pstmt.executeUpdate();
-        rt = pstmt.executeUpdate();
-        
-        logger.info("rt = " + rt);
-
-		} catch (SQLException e){
-				e.printStackTrace();
-				
-		} finally {
-			//관련자원 닫기
-			DBUtil.closeConnection(pstmt);
+	public Object EmpUpdate(EmpDto dto, SqlMapClient sqlMapper) throws SQLException, IOException {
+		
+		    logger.info("##########  EmpDao : EmpUpdate ========================================");
+	  
+		    obj = sqlMapper.update("updateEMP", dto);
+		     
+		     logger.info("##########  EmpDao : Return obj : " + obj);	
+/*		     logger.info("getName: {}"+ obj.getClass().getName());
+		     logger.info("id: {}"+ obj.toString());*/
+	      
+	       return obj;
 		}
-		return rt;
+
+public Object EmpDelete(EmpDto dto,SqlMapClient sqlMapper) throws SQLException, IOException {
+	    
+	    logger.info("############ EmpDao : EmpDelete : start =====================================");
+		  
+	    obj = sqlMapper.update("deleteEMP", dto);	    
+	    
+	    logger.info("##########  EmpDao : Return obj : " + obj);        
+       logger.info("##########  EmpDao : EmpDelete : END =====================================");
+       
+        return obj;
 	}
 
-public int EmpDelete(EmpDto dto,Connection conn) throws SQLException, IOException {
-	   logger.info("EmpDao : EmpDelete : start =====================================");
-	   int rt = 0;
-	
-	//LogUtil.LogRequestParams(request);
-	
-//    int seq = Integer.parseInt(request.getParameter("seq"));
-     
-        //PreparedStatement 선언
-        PreparedStatement pstmt = null;   
-               
-        StringBuffer sb= new StringBuffer("");
-        sb.append(" delete from emp                  \n");      
-        sb.append(" where seq = ?                    \n"); 
-        
-        // INFO 레벨로 로그출력
-        logger.info("sql = " + sb.toString());
-        logger.info("seq = " + dto.getSeq());
-         
-        try { 
-       //파라미터 바인딩
-        pstmt = conn.prepareStatement(sb.toString());
-        pstmt.setInt( 1, dto.getSeq());
-        
-        logger.info(sb.toString());
-        logger.info("Delete ID =" + dto.getSeq());
-        
-        //쿼리실행
-        rt = pstmt.executeUpdate();
-        
-        logger.info("EmpDao : EmpDelete : END =====================================");
-       
-} catch (SQLException e){
-	e.printStackTrace();
-	
-} finally {
-//관련자원 닫기
-DBUtil.closeConnection(pstmt);
-}
-return rt;
-}
-
-public int  EmpLogin(EmpDto setdto,Connection conn) throws SQLException, IOException {
-	int rt = 0;
+public int EmpLogin(EmpDto dto,SqlMapClient sqlMapper) throws SQLException, IOException {
+	 logger.info("Login_emp.do : EmpDao ============================");
+	 logger.info(dto.toString()); 
+	  
+	 obj = sqlMapper.queryForList("EmpLogin",dto);  
 	 
-	//LogUtil.LogRequestParams(request);
+	 logger.info("#############  EmpDao : return ResultSet : " + obj);
+	 
+	 rt = ((ArrayList<EmpDto>) obj).size();
 	
-	String id = Integer.toString(setdto.getId());
-	String passwd = setdto.getPasswd();
+     //logger.info("###### obj : " + ((ResultSet) obj).last());
 	
-	logger.info("Login_emp.do : EmpDao ============================");
-     
-    ///Resultset 선언
-	ResultSet rs = null;
-	//PreparedStatement 선언
-	PreparedStatement pstmt = null;
-	//Query작성
-	StringBuffer sb= new StringBuffer("");
-
-	sb.append(" SELECT                          \n");      
-	sb.append("      id,passwd                    \n"); 
-	sb.append(" FROM emp                        \n"); 
-	sb.append(" where                           \n");
-	sb.append("   id=?                          \n");
-	sb.append("   and                          \n");
-	sb.append("   passwd=?                   \n");
-	
-    // INFO 레벨로 로그출력
-    logger.info("sql = " + sb.toString());
-    logger.info("id = " + id);
-    logger.info("passwd = " + passwd);
-     
-
-	try {
-		//쿼리실행
-		pstmt = conn.prepareStatement(sb.toString());
+	 logger.info("EmpDao : obj size : " + rt);  
 		
-		if ( id != null) {
-		    // Parameter 바인딩
-		    pstmt.setString( 1, id);
-		    pstmt.setString( 2, passwd);
-		}
-		rs = pstmt.executeQuery();http://127.0.0.1:8080/mvcTEST/index.html
-		
-		rs.last();
-		
-		rt = rs.getRow();
-        
-		logger.info("rt = " + rt);
-} catch (SQLException e){
-	e.printStackTrace();
-	
-} finally {
-//관련자원 닫기
-DBUtil.closeConnection(pstmt);
-}
 return rt;
 }
 

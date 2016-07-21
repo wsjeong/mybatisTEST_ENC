@@ -1,5 +1,6 @@
 package com.rp.db;
 import java.beans.PropertyVetoException;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,7 +15,7 @@ public class MyDataSource {
         ds.setDriverClassName("com.mysql.jdbc.Driver");
         ds.setUsername("wsjeong");
         ds.setPassword("rplinux");
-        ds.setUrl("jdbc:mysql://192.168.57.102:3306/wsjeongdb");
+        ds.setUrl("jdbc:mysql://192.168.56.15:3306/wsjeongdb");
          
      // the settings below are optional -- dbcp can work with defaults
         ds.setMinIdle(5);

@@ -58,6 +58,9 @@
     <logger name="com.rp">
         <level value="DEBUG"/>
     </logger>
+        <logger name="com.ibatis">
+        <level value="DEBUG"/>
+    </logger>
   
   
     <!-- 기본 출력 설정 -->

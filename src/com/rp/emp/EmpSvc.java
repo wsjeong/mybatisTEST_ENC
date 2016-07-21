@@ -1,227 +1,189 @@
 package com.rp.emp;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import com.ibatis.sqlmap.client.SqlMapClient;
 import com.rp.DBUtil;
+import com.rp.db.MyAppSqlMapConfig;
 import com.rp.db.MyDataSource;
 
 import org.apache.log4j.Logger;
 
 public class EmpSvc {
 	final static Logger logger = Logger.getLogger(EmpSvc.class);
-	 public ArrayList<EmpDto> getEmpList(EmpSearchDto sdto) {
-	        Connection conn = null;
+	
+    int rt = 0;
+    Object obj=null;
+    
+    EmpDao dao = new EmpDao();
+	
+	 public ArrayList<EmpDto> getEmpList(EmpSearchDto sdto) throws IOException {
 	        ArrayList<EmpDto> al = null;
-	                           
+	        
         try {
-            conn = MyDataSource.getInstance().getConnection();
-             // Transaction 시작
-            conn.setAutoCommit(false);
+
+            SqlMapClient sqlMapClient = MyAppSqlMapConfig.getSqlMapInstance();           
              
-            EmpDao dao = new EmpDao();
-            al = dao.selectEMPlist(sdto, conn);    
-            
-           // System.out.println("svc========================================" + al.size());
-      
-            // Transaction 종료
-            conn.commit();
-            conn.setAutoCommit(true);                        
-             
+       
+            EmpDao dao = EmpDao.getInstance();
+            al = dao.selectEMPlist(sdto, sqlMapClient);    
+     
         } catch (Exception e) {
-            try {
-                if ( conn != null) conn.rollback();
-            } catch (SQLException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            System.out.println("error : " + e);
-            e.printStackTrace(System.out);
+            logger.error("StackTrace Logger", e);
+            e.printStackTrace();
              
         } finally {
-            //관련자원 닫기
-            DBUtil.closeConnection(conn);
+          
         }
         return al;
     }
-	 
-	 public EmpDto selectDetail(EmpDto dto) {
-	        
-		 Connection conn = null;
-	                           
+ 
+   public EmpDto selectDetail(EmpDto dto) {
+		  List<EmpDto> list = null;
+		  EmpDto detail_dto = null;
      try {
-         conn = MyDataSource.getInstance().getConnection();
+
+    	  SqlMapClient sqlMapClient = MyAppSqlMapConfig.getSqlMapInstance();   
+    	 
+          EmpDao dao = EmpDao.getInstance();
+          detail_dto = dao.selectDetail(dto, sqlMapClient);
           
-         // Transaction 시작
-         conn.setAutoCommit(false);
-          
-         EmpDao dao = new EmpDao();
-         dto = dao.selectDetail(dto, conn);          
-   
-         // Transaction 종료
-         conn.commit();
-         conn.setAutoCommit(true);                        
+          logger.info("##########  EmpSvr : Return list : " + list);
+                    
           
      } catch (Exception e) {
-         try {
-             conn.rollback();
-         } catch (SQLException e1) {
-             // TODO Auto-generated catch block
-             e1.printStackTrace();
-         }
+         
          System.out.println("error : " + e);
          e.printStackTrace(System.out);
           
      } finally {
-         //관련자원 닫기
-         DBUtil.closeConnection(conn);
+
      }
-     return dto;
+     return detail_dto;
  }
      
-    public int addEmp(EmpDto dto) {
-        Connection conn = null;
-        int rt = 0;
-         
+    public Object addEmp(EmpDto dto) {
+    	
+   	 	SqlMapClient sqlMapClient = MyAppSqlMapConfig.getSqlMapInstance();
+   	 	
         try {
-            conn = MyDataSource.getInstance().getConnection();
+      	 
+             // Transaction 시작
+             sqlMapClient.startTransaction();
              
-            // Transaction 시작
-            conn.setAutoCommit(false);
-             
-            EmpDao dao = new EmpDao();
-            rt = dao.insertEMP(dto, conn);
-             
-            // Transaction 종료
-            conn.commit();
-            conn.setAutoCommit(true);
-                         
+            obj = dao.insertEMP(dto, sqlMapClient);
+            
+            // Transaction Commit
+            sqlMapClient.commitTransaction();
              
         } catch (Exception e) {
-        	e.printStackTrace();
-            try {
-                conn.rollback();
-            } catch (SQLException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            System.out.println("error : " + e);
-            e.printStackTrace(System.out);
+            logger.error("StackTrace Logger", e);
+            e.printStackTrace();
              
         } finally {
-            //관련자원 닫기
-            DBUtil.closeConnection(conn);
+            try {
+                // Transaction End
+                sqlMapClient.endTransaction();
+                
+            } catch (SQLException e) {
+                logger.error("StackTrace Logger", e);
+                e.printStackTrace();
+            }
         }
-        return rt;
+        return obj;
     }
     
     
-    public int EmpUpdate(EmpDto dto) {
-        Connection conn = null;
-        //EmpDto dto = new EmpDto();
-        int rt = 0;
-         
+    public Object EmpUpdate(EmpDto dto) {
+    	
+    	SqlMapClient sqlMapClient = MyAppSqlMapConfig.getSqlMapInstance();
+
         try {
-            conn = MyDataSource.getInstance().getConnection();
-             
+        	
             // Transaction 시작
-            conn.setAutoCommit(false);
+            sqlMapClient.startTransaction();
              
             EmpDao dao = new EmpDao();
-            rt = dao.EmpUpdate(dto, conn);
+            obj = dao.EmpUpdate(dto, sqlMapClient);
              
-            // Transaction 종료
-            conn.commit();
-            conn.setAutoCommit(true);
-                                     
+            // Transaction Commit
+            sqlMapClient.commitTransaction();
+            
         } catch (Exception e) {
-            try {
-                conn.rollback();
-            } catch (SQLException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            System.out.println("error : " + e);
-            e.printStackTrace(System.out);
+            logger.error("StackTrace Logger", e);
+            e.printStackTrace();
              
         } finally {
-            //관련자원 닫기
-            DBUtil.closeConnection(conn);
+            try {
+                // Transaction End
+                sqlMapClient.endTransaction();
+                
+            } catch (SQLException e) {
+                logger.error("StackTrace Logger", e);
+                e.printStackTrace();
+            }
         }
-        return rt;
+        return obj;
     }
     
-    public int EmpDelete(EmpDto dto) {
-        Connection conn = null;
-        //EmpDto dto = new EmpDto();
-        int rt = 0;
+    public Object EmpDelete(EmpDto dto) {
+    	
+    	SqlMapClient sqlMapClient = MyAppSqlMapConfig.getSqlMapInstance();
          
         try {
-            conn = MyDataSource.getInstance().getConnection();
-             
-            // Transaction 시작
-            conn.setAutoCommit(false);
+        	   // Transaction 시작
+            sqlMapClient.startTransaction();
              
             EmpDao dao = new EmpDao();
-            rt = dao.EmpDelete(dto, conn);
-             
-            // Transaction 종료
-            conn.commit();
-            conn.setAutoCommit(true);
-                                     
+            obj = dao.EmpDelete(dto, sqlMapClient);
+            
+            // Transaction Commit
+            sqlMapClient.commitTransaction();
+            
+            logger.info("##########  EmpSvc : Return obj : " + obj);                
+           
         } catch (Exception e) {
-            try {
-                conn.rollback();
-            } catch (SQLException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            System.out.println("error : " + e);
-            e.printStackTrace(System.out);
+            logger.error("StackTrace Logger", e);
+            e.printStackTrace();
              
         } finally {
-            //관련자원 닫기
-            DBUtil.closeConnection(conn);
+            try {
+                // Transaction End
+                sqlMapClient.endTransaction();
+                
+            } catch (SQLException e) {
+                logger.error("StackTrace Logger", e);
+                e.printStackTrace();
+            }
         }
-        return rt;
+        return obj;
     }
     
     public int EmpLogin(EmpDto dto) {
-    	int rt = 0;
-    	Connection conn = null;
-    	
-		 logger.info(dto.toString());   	
+		 logger.info(dto.toString()); 
          
         try {
-            conn = MyDataSource.getInstance().getConnection();
-             
-            // Transaction 시작
-            conn.setAutoCommit(false);
+        	  SqlMapClient sqlMapClient = MyAppSqlMapConfig.getSqlMapInstance();  
              
      		 logger.info("Login_emp.do : EmpSvc ============================");
      		
             EmpDao dao = new EmpDao();
             
-            rt = dao.EmpLogin(dto, conn);
-             
-            // Transaction 종료
-            conn.commit();
-            conn.setAutoCommit(true);
+             rt = dao.EmpLogin(dto, sqlMapClient);  
+             logger.info("############ EmpSvc - return rt :" + rt);
                                      
         } catch (Exception e) {
-            try {
-                conn.rollback();
-            } catch (SQLException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
             System.out.println("error : " + e);
             e.printStackTrace(System.out);
              
         } finally {
             //관련자원 닫기
-            DBUtil.closeConnection(conn);
         }
         return rt;
     }
