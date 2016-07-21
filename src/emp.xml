@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap     
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"     
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="emp">
+     <select id="EmpLogin" parameterClass="com.rp.emp.EmpDto" resultClass="com.rp.emp.EmpDto">
+        SELECT                               
+				id,passwd                     
+		 FROM emp                     
+		 <dynamic prepend="where"> 
+			 <isNotNull property="id" prepend="and">
+			 	id = #id#
+			 </isNotNull>
+		     <isNotNull property="passwd" prepend="and">
+			 	passwd = #passwd#
+			 </isNotNull>		       
+		</dynamic>
+    </select>
+    <select id="selectEmpList" parameterClass="com.rp.emp.EmpSearchDto" resultClass="com.rp.emp.EmpDto">
+        SELECT  seq , id , passwd , first , last , age , emp_dept.dept_nm   FROM emp,emp_dept             
+         <dynamic prepend="where"> 
+                               1 = 1              
+               AND
+                   emp.dept_seq = emp_dept.dept_seq     
+         	  <isEqual property="Search_type" compareValue="id" >
+                AND id = #Search_string#
+            </isEqual>   
+            <isEqual  property="Search_type" compareValue="first" >
+                AND first = #Search_string#
+            </isEqual>   
+            <isEqual property="Search_type" compareValue="last" >
+                AND last = #Search_string#
+            </isEqual>   
+            <isEqual  property="Search_type" compareValue="age" >
+                AND age = #Search_string#
+            </isEqual>   
+        </dynamic>
+    </select>
+     <select id="selectDetail" parameterClass="com.rp.emp.EmpDto" resultClass="com.rp.emp.EmpDto">
+        SELECT                              
+              seq                        ,     
+              id                         ,     
+              passwd                     ,     
+              first                      ,     
+              last                       ,     
+              age							  ,
+              emp_dept.dept_nm                             
+         FROM emp,emp_dept        
+        <dynamic prepend="where">      
+			 <isNotNull property="seq" prepend="and">
+			 	seq = #seq#
+			 </isNotNull>
+        </dynamic>
+          AND
+              emp.dept_seq = emp_dept.dept_seq         
+    </select>
+    <insert id="insertEmp" parameterClass="com.rp.emp.EmpDto">
+      <![CDATA[
+      INSERT INTO emp(
+             id                         ,     
+              passwd                     ,     
+              first                      ,     
+              last                       ,     
+              age                        ,
+              dept_seq
+              )                        
+      values (
+             #id#                         ,     
+              #passwd#                     ,     
+              #first#                      ,     
+              #last#                       ,     
+              #age#                        ,
+              #dept_seq#
+              )  
+        ]]>
+      <selectKey resultClass="int" keyProperty="id">
+         select last_insert_id() as id
+      </selectKey>
+       
+    </insert>
+    <update id="updateEMP" parameterClass="com.rp.emp.EmpDto">
+      UPDATE emp 
+      	  SET
+              passwd=#passwd#		            ,     
+              first=#first#                    ,     
+              last=#last#                       ,     
+              age=#age#                        ,
+              dept_seq=#dept_seq#
+ 		
+ 		<dynamic prepend="where">      
+			 <isNotNull property="seq" prepend="and">
+			 	seq = #seq#
+			 </isNotNull>
+        </dynamic>
+	</update>
+	<delete id="deleteEMP" parameterClass="com.rp.emp.EmpDto">
+      DELETE 
+        FROM 
+        		emp
+ 		<dynamic prepend="where">      
+			 <isNotNull property="seq" prepend="and">
+			 	seq = #seq#
+			 </isNotNull>
+        </dynamic>
+	</delete>
+</sqlMap>
