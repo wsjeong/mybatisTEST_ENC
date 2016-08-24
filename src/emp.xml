@@ -1,42 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE sqlMap     
-    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"     
-    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
-<sqlMap namespace="emp">
-     <select id="EmpLogin" parameterClass="com.rp.emp.EmpDto" resultClass="com.rp.emp.EmpDto">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rp.emp.EmpDao">
+     <select id="EmpLogin" parameterType="com.rp.emp.EmpDto" resultType="com.rp.emp.EmpDto">
         SELECT                               
 				id,passwd                     
 		 FROM emp                     
-		 <dynamic prepend="where"> 
-			 <isNotNull property="id" prepend="and">
-			 	id = #id#
-			 </isNotNull>
-		     <isNotNull property="passwd" prepend="and">
-			 	passwd = #passwd#
-			 </isNotNull>		       
-		</dynamic>
+		 WHERE id = #{id} 
+		        AND
+		       passwd = #{passwd}
     </select>
-    <select id="selectEmpList" parameterClass="com.rp.emp.EmpSearchDto" resultClass="com.rp.emp.EmpDto">
-        SELECT  seq , id , passwd , first , last , age , emp_dept.dept_nm   FROM emp,emp_dept             
-         <dynamic prepend="where"> 
-                               1 = 1              
+    <select id="selectEmpList" parameterType="com.rp.emp.EmpSearchDto" resultType="com.rp.emp.EmpDto">
+        SELECT  seq 		, 
+                id 		,
+                passwd 	,
+                first 	,
+                last	 	,
+                age		,
+                emp_dept.dept_nm   
+        FROM    emp,emp_dept             
+        WHERE  1 = 1              
                AND
-                   emp.dept_seq = emp_dept.dept_seq     
-         	  <isEqual property="Search_type" compareValue="id" >
-                AND id = #Search_string#
-            </isEqual>   
-            <isEqual  property="Search_type" compareValue="first" >
-                AND first = #Search_string#
-            </isEqual>   
-            <isEqual property="Search_type" compareValue="last" >
-                AND last = #Search_string#
-            </isEqual>   
-            <isEqual  property="Search_type" compareValue="age" >
-                AND age = #Search_string#
-            </isEqual>   
-        </dynamic>
+               emp.dept_seq = emp_dept.dept_seq     
+          <if test="search_type != null and search_string != 'all'">
+               AND ${search_type} = #{search_string}
+         </if>        
     </select>
-     <select id="selectDetail" parameterClass="com.rp.emp.EmpDto" resultClass="com.rp.emp.EmpDto">
+    <select id="selectDetail" parameterType="com.rp.emp.EmpDto" resultType="com.rp.emp.EmpDto">
+       <![CDATA[
         SELECT                              
               seq                        ,     
               id                         ,     
@@ -45,16 +36,13 @@
               last                       ,     
               age							  ,
               emp_dept.dept_nm                             
-         FROM emp,emp_dept        
-        <dynamic prepend="where">      
-			 <isNotNull property="seq" prepend="and">
-			 	seq = #seq#
-			 </isNotNull>
-        </dynamic>
-          AND
-              emp.dept_seq = emp_dept.dept_seq         
+         FROM emp,emp_dept   
+         WHERE seq = #{seq}     
+               AND
+               emp.dept_seq = emp_dept.dept_seq
+               ]]>         
     </select>
-    <insert id="insertEmp" parameterClass="com.rp.emp.EmpDto">
+    <insert id="insertEmp" parameterType="com.rp.emp.EmpDto">
       <![CDATA[
       INSERT INTO emp(
              id                         ,     
@@ -65,42 +53,33 @@
               dept_seq
               )                        
       values (
-             #id#                         ,     
-              #passwd#                     ,     
-              #first#                      ,     
-              #last#                       ,     
-              #age#                        ,
-              #dept_seq#
+             #{id}                         ,     
+              #{passwd}                     ,     
+              #{first}                      ,     
+              #{last}                       ,     
+              #{age}                        ,
+              #{dept_seq}
               )  
         ]]>
-      <selectKey resultClass="int" keyProperty="id">
-         select last_insert_id() as id
+      <selectKey resultType="integer" keyProperty="seq" order="AFTER">
+         select last_insert_id()
       </selectKey>
        
     </insert>
-    <update id="updateEMP" parameterClass="com.rp.emp.EmpDto">
+    <update id="updateEMP" parameterType="com.rp.emp.EmpDto">
       UPDATE emp 
       	  SET
-              passwd=#passwd#		            ,     
-              first=#first#                    ,     
-              last=#last#                       ,     
-              age=#age#                        ,
-              dept_seq=#dept_seq#
+              passwd=#{passwd}		            ,     
+              first=#{first}                    ,     
+              last=#{last}                       ,     
+              age=#{age}                        ,
+              dept_seq=#{dept_seq}
  		
- 		<dynamic prepend="where">      
-			 <isNotNull property="seq" prepend="and">
-			 	seq = #seq#
-			 </isNotNull>
-        </dynamic>
+ 		  WHERE seq = #{seq}	
 	</update>
-	<delete id="deleteEMP" parameterClass="com.rp.emp.EmpDto">
+	<delete id="deleteEMP" parameterType="com.rp.emp.EmpDto">
       DELETE 
-        FROM 
-        		emp
- 		<dynamic prepend="where">      
-			 <isNotNull property="seq" prepend="and">
-			 	seq = #seq#
-			 </isNotNull>
-        </dynamic>
+        FROM   emp
+         WHERE seq = #{seq}
 	</delete>
-</sqlMap>
+</mapper>

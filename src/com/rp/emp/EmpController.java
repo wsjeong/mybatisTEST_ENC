@@ -1,6 +1,8 @@
 package com.rp.emp;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import com.rp.AESEncrypt;
 
 @WebServlet("*.do")
 public class EmpController extends HttpServlet {
@@ -45,6 +50,8 @@ public class EmpController extends HttpServlet {
         
    	     EmpDto dto = new EmpDto();
    	     EmpSvc svc = new EmpSvc();
+         // Provider 추가
+         Security.addProvider(new BouncyCastleProvider());
        
         //RequestURI 구하기
         String command = request.getRequestURI();        // /jdbc-sample-mvc/login/login.do
@@ -69,7 +76,7 @@ public class EmpController extends HttpServlet {
 				RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
 			
 				rd.forward(request, response);
-			//response.sendRedirect("login.do");
+				//response.sendRedirect("login.do");
 	} else if (session.getAttribute("id") != null) {     
         	
 		logger.info("#########  senssion not null!!!!!!!"); 
@@ -99,23 +106,39 @@ public class EmpController extends HttpServlet {
             //response.sendRedirect("select_emp_detail.do");
             
       } else if (("/insert_emp_form.do").equals(command)) {
-      
+    	      
     	   logger.info("#########  controller : insert_emp_form.do ===============================================");
         	 
           RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_insert_form.jsp");
-         // rd.forward(request, response);
-          response.sendRedirect("insert_emp_form.do");
+          rd.forward(request, response);
+         // response.sendRedirect("insert_emp_form.do");
         
        } else if (("/insert_emp.do").equals(command)) {
          	 
           	logger.info("#########  controller : insert_emp.do ===============================================");
+          	
+          	 String passwd = request.getParameter("passwd");
+          	 String encodedKey = "RockpalceMidware";
+            
+          	 System.out.println("#########  secretKey: " + encodedKey);
+          	 System.out.println("#########  passwd   : " + passwd);
           	 
+           AESEncrypt Enc = new AESEncrypt();
+           
+           try {
+				  dto.setPasswd(Enc.Encrypt(passwd, encodedKey));
+				  System.out.println("#########  passwd   :" + dto.passwd);
+				  
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+          	          	 
         	 //dto.setSeq(Integer.parseInt(request.getParameter("seq")));
         	 dto.setId(Integer.parseInt(request.getParameter("id")));
         	 dto.setAge(Integer.parseInt(request.getParameter("age")));
         	 dto.setFirst(request.getParameter("first"));
         	 dto.setLast(request.getParameter("last"));
-        	 dto.setPasswd(request.getParameter("passwd"));
         	 dto.setDeptSeq(Integer.parseInt(request.getParameter("dept_seq")));      
     	 
         	 logger.info("############  controller : insert_emp.do : EmpDto Info " + dto.toString());
@@ -144,8 +167,30 @@ public class EmpController extends HttpServlet {
     	     logger.info("#########  controller : update_emp_form.do ===============================================");
 	
         	 dto.setSeq(Integer.parseInt(request.getParameter("seq")));
+        	 
+        	 EmpDto detail = null ;
+        	 detail = (EmpDto)svc.selectDetail(dto);
+        	 
+        	 String passwd = detail.getPasswd();
+        	 String encodedKey = "RockpalceMidware";
+            
+        	 logger.info(" ###### Controller Return Dto : " + detail);
+        	 
+          	 System.out.println("#########  secretKey: " + encodedKey);
+          	 System.out.println("#########  passwd   : " + detail.getPasswd());
+          	 
+           AESEncrypt Enc = new AESEncrypt();
+        	 
+           try {
+				  detail.setPasswd(Enc.Decrypt(passwd, encodedKey));
+				  System.out.println("#########  passwd   :" + detail.getPasswd());
+				  
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
       	     
-        	 request.setAttribute("detail",(EmpDto)svc.selectDetail(dto)); 
+        	 request.setAttribute("detail",detail); 
       	     RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/jsp/emp_update_form.jsp");
             
       	     rd.forward(request, response);
@@ -155,11 +200,28 @@ public class EmpController extends HttpServlet {
 	    
     	     logger.info("#########  controller : update_emp.do ===============================================");
 	
+    	     String passwd = request.getParameter("passwd");
+            String encodedKey = "RockpalceMidware";
+            
+          	 System.out.println("#########  secretKey: " + encodedKey);
+          	 System.out.println("#########  passwd   : " + passwd);
+          	 
+           AESEncrypt Enc = new AESEncrypt();
+           
+           try {
+				  dto.setPasswd(Enc.Encrypt(passwd, encodedKey));
+				  System.out.println("#########  passwd   :" + dto.passwd);
+				  
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	     
        	 dto.setSeq(Integer.parseInt(request.getParameter("seq")));
        	 dto.setId(Integer.parseInt(request.getParameter("id")));
        	 dto.setAge(Integer.parseInt(request.getParameter("age")));
        	 dto.setFirst(request.getParameter("first"));
-       	 dto.setPasswd(request.getParameter("passwd"));
+       	 //dto.setPasswd(request.getParameter("passwd"));
        	 dto.setLast(request.getParameter("last"));
        	 dto.setDeptSeq(Integer.parseInt(request.getParameter("dept_seq"))); 
             
@@ -216,9 +278,25 @@ public class EmpController extends HttpServlet {
     } else {
 	        	 
         	 if (("/login_emp.do").equals(command)) {       	 
-        			
+        		
+               String passwd = request.getParameter("passwd");       	 
+               String encodedKey = "RockpalceMidware";
+                
+           	 System.out.println("#########  secretKey:" + encodedKey);
+          	    System.out.println("#########  passwd   : " + passwd);
+        		 
 	        	 dto.setId(Integer.parseInt(request.getParameter("id")));
 	         	 dto.setPasswd(request.getParameter("passwd"));
+	        	 
+	           AESEncrypt Enc = new AESEncrypt();
+	             
+	             try {
+	  				  dto.setPasswd(Enc.Encrypt(passwd, encodedKey));
+					  System.out.println("#########  passwd   :" + dto.passwd);
+	  			} catch (Exception e) {
+	  				// TODO Auto-generated catch block
+	  				e.printStackTrace();
+	  			}
 	         	 
 	     		logger.info("#########  controller : Login_emp.do =======================================");
 	     		logger.info(dto.toString());

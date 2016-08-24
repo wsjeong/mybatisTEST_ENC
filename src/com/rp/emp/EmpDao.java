@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -36,28 +37,28 @@ public class EmpDao {
     }
     
     // Emp 데이터 조회
-	public ArrayList<EmpDto> selectEMPlist(EmpSearchDto sdto, SqlMapClient sqlMapper) throws SQLException {		
+	public List<EmpDto> selectEMPlist(EmpSearchDto sdto, SqlSession sqlSession) throws SQLException {		
         
         // Query ID 만 넘겨주면 해당 쿼리를 실행하여 데이터 조회
-		ArrayList<EmpDto> list =  (ArrayList<EmpDto>) sqlMapper.queryForList("selectEmpList", sdto);
+		List<EmpDto> list =  sqlSession.selectList("com.rp.emp.EmpDao.selectEmpList", sdto);
         
        return list; 
     }
 	
-	public EmpDto selectDetail(EmpDto dto, SqlMapClient sqlMapper) throws SQLException, IOException, PropertyVetoException {
+	public EmpDto selectDetail(EmpDto dto, SqlSession sqlSession) throws SQLException, IOException, PropertyVetoException {
          logger.info("##########  EmpDao : selectDetail ========================================");
          
-         EmpDto detail_dto =  (EmpDto) sqlMapper.queryForObject("selectDetail", dto);
+         EmpDto detail_dto =  (EmpDto) sqlSession.selectOne("selectDetail", dto);
          
         // logger.info("##########  EmpDao : Return list :" + list);
          
         return detail_dto;
     }
      
-	public Object insertEMP(EmpDto dto, SqlMapClient sqlMapper) throws SQLException {
+	public Object insertEMP(EmpDto dto, SqlSession sqlSession) throws SQLException {
 		 logger.info("##########  EmpDao : insertEMP ========================================");
 		 
-	     obj = sqlMapper.insert("insertEmp", dto);
+	     obj = sqlSession.insert("insertEmp", dto);
 	     
 	     logger.info("##########  EmpDao : Return obj : " + obj);	
         logger.info("getName: {}"+ obj.getClass().getName());
@@ -66,11 +67,11 @@ public class EmpDao {
         return obj;
     }
 
-	public Object EmpUpdate(EmpDto dto, SqlMapClient sqlMapper) throws SQLException, IOException {
+	public Object EmpUpdate(EmpDto dto, SqlSession sqlSession) throws SQLException, IOException {
 		
 		    logger.info("##########  EmpDao : EmpUpdate ========================================");
 	  
-		    obj = sqlMapper.update("updateEMP", dto);
+		    obj = sqlSession.update("updateEMP", dto);
 		     
 		     logger.info("##########  EmpDao : Return obj : " + obj);	
 /*		     logger.info("getName: {}"+ obj.getClass().getName());
@@ -79,11 +80,11 @@ public class EmpDao {
 	       return obj;
 		}
 
-public Object EmpDelete(EmpDto dto,SqlMapClient sqlMapper) throws SQLException, IOException {
+public Object EmpDelete(EmpDto dto,SqlSession sqlSession) throws SQLException, IOException {
 	    
 	    logger.info("############ EmpDao : EmpDelete : start =====================================");
 		  
-	    obj = sqlMapper.update("deleteEMP", dto);	    
+	    obj = sqlSession.delete("deleteEMP", dto);	    
 	    
 	    logger.info("##########  EmpDao : Return obj : " + obj);        
        logger.info("##########  EmpDao : EmpDelete : END =====================================");
@@ -91,11 +92,11 @@ public Object EmpDelete(EmpDto dto,SqlMapClient sqlMapper) throws SQLException, 
         return obj;
 	}
 
-public int EmpLogin(EmpDto dto,SqlMapClient sqlMapper) throws SQLException, IOException {
+public int EmpLogin(EmpDto dto,SqlSession sqlSession) throws SQLException, IOException {
 	 logger.info("Login_emp.do : EmpDao ============================");
 	 logger.info(dto.toString()); 
 	  
-	 obj = sqlMapper.queryForList("EmpLogin",dto);  
+	 obj = sqlSession.selectList("EmpLogin",dto);  
 	 
 	 logger.info("#############  EmpDao : return ResultSet : " + obj);
 	 

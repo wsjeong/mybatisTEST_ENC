@@ -14,7 +14,7 @@ if (request.getParameter("search_string") != null) {
     search_string = request.getParameter("search_string");
 }
 
-ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
+List<EmpDto> list = (List<EmpDto>)request.getAttribute("list");
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -60,15 +60,15 @@ ArrayList<EmpDto> al = (ArrayList<EmpDto>)request.getAttribute("list");
     </tr>
     <%
     //Result Set Fetch
-    for (int i=0; i < al.size(); i++){
-        al.get(i).getAge();
+    for (int i=0; i < list.size(); i++){
+        list.get(i).getAge();
       %>
       <tr>
-          <td><a href="select_emp_detail.do?seq=<%=al.get(i).getSeq()%>"><%=al.get(i).getId()%></a></td>
-          <td><%=al.get(i).getFirst()%></td>
-          <td><%=al.get(i).getLast()%></td>
-          <td><%=al.get(i).getAge()%></td>
-          <td><%=al.get(i).getDeptNM()%></td>
+          <td><a href="select_emp_detail.do?seq=<%=list.get(i).getSeq()%>"><%=list.get(i).getId()%></a></td>
+          <td><%=list.get(i).getFirst()%></td>
+          <td><%=list.get(i).getLast()%></td>
+          <td><%=list.get(i).getAge()%></td>
+          <td><%=list.get(i).getDeptNM()%></td>
       </tr>
     <%
     }
